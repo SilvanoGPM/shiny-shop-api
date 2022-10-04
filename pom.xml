@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>com.skyg0d</groupId>
-    <artifactId>spring-boot-jwt</artifactId>
+    <artifactId>shiny-shop-api</artifactId>
     <version>1.0.0</version>
-    <name>spring-boot-jwt</name>
-    <description>SpringBoot Boilerplate with JWT Refresh Token</description>
+    <name>shiny-shop-api</name>
+    <description>API para um E-commerce desenvolvida com Spring Boot.</description>
 
     <properties>
         <java.version>11</java.version>
