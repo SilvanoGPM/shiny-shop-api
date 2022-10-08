@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,28 +41,35 @@ public class Product extends BaseEntity {
 
     private String brand;
 
-    private List<String> images;
-
     @Positive
     private BigDecimal price;
 
-    private Set<String> sizes = new HashSet<>();
-
-    private Set<String> features = new HashSet<>();
-
     @PositiveOrZero
-    private Long amount;
+    private long amount;
 
     @PositiveOrZero
     @Max(100)
-    private Integer discount = 0;
+    @Builder.Default
+    private int discount = 0;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
+            name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
+
+    @ElementCollection(targetClass = String.class)
+    private List<String> images = new ArrayList<>();
+
+    @ElementCollection(targetClass = String.class)
+    private List<String> sizes = new ArrayList<>();
+
+    @ElementCollection(targetClass = String.class)
+    private List<String> features = new ArrayList<>();
+
+    @Builder.Default
+    private boolean active = true;
 
 }

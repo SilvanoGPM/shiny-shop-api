@@ -1,9 +1,6 @@
 package com.skyg0d.shop.shiny.handler;
 
-import com.skyg0d.shop.shiny.exception.BadRequestException;
-import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
-import com.skyg0d.shop.shiny.exception.TokenRefreshException;
-import com.skyg0d.shop.shiny.exception.UserAlreadyExistsException;
+import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
 import com.skyg0d.shop.shiny.exception.details.ValidationExceptionDetails;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +52,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ExceptionDetails handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
         return ExceptionDetails
                 .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "User Already Exists");
+    }
+
+    @ExceptionHandler(SlugAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleSlugAlreadyExistsException(SlugAlreadyExistsException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Already Exists");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
