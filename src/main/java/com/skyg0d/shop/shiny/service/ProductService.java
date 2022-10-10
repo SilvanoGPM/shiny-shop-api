@@ -38,9 +38,13 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with slug: " + slug));
     }
 
+    public UserProductResponse findBySlugMapped(String slug) throws ResourceNotFoundException {
+        return mapper.toUserProductResponse(findBySlug(slug));
+    }
+
     public void verifySlugExists(String slug) throws SlugAlreadyExistsException {
         if (productRepository.existsBySlug(slug)) {
-            throw new SlugAlreadyExistsException(slug);
+            throw new SlugAlreadyExistsException("Product", slug);
         }
     }
 

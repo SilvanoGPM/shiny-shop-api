@@ -31,6 +31,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.listAllActive(pageable));
     }
 
+    @GetMapping("/{slug}")
+    public ResponseEntity<UserProductResponse> findBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(productService.findBySlugMapped(slug));
+    }
+
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<AdminProductResponse>> listAll(Pageable pageable) {
