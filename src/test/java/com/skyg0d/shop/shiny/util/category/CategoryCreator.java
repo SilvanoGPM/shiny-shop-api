@@ -1,6 +1,10 @@
 package com.skyg0d.shop.shiny.util.category;
 
+import com.skyg0d.shop.shiny.mapper.CategoryMapper;
 import com.skyg0d.shop.shiny.model.Category;
+import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
+import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
+import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
 
 public class CategoryCreator {
 
@@ -24,6 +28,30 @@ public class CategoryCreator {
 
     public static Category createCategory() {
         return Category
+                .builder()
+                .slug(SLUG)
+                .name(NAME)
+                .description(DESCRIPTION)
+                .thumbnail(THUMBNAIL)
+                .build();
+    }
+
+    public static CategoryResponse createCategoryResponse() {
+        return CategoryMapper.INSTANCE.toCategoryResponse(createCategory());
+    }
+
+    public static CreateCategoryRequest createCreateCategoryRequest() {
+        return CreateCategoryRequest
+                .builder()
+                .slug(SLUG)
+                .name(NAME)
+                .description(DESCRIPTION)
+                .thumbnail(THUMBNAIL)
+                .build();
+    }
+
+    public static ReplaceCategoryRequest createReplaceCategoryRequest() {
+        return ReplaceCategoryRequest
                 .builder()
                 .slug(SLUG)
                 .name(NAME)

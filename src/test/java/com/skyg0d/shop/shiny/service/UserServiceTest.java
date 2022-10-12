@@ -1,8 +1,8 @@
 package com.skyg0d.shop.shiny.service;
 
+import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.model.ERole;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.skyg0d.shop.shiny.util.role.RoleCreator.*;
+import static com.skyg0d.shop.shiny.util.role.RoleCreator.createRole;
 import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
 import static org.assertj.core.api.Assertions.*;
 

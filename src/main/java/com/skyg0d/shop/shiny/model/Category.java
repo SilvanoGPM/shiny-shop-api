@@ -2,11 +2,13 @@ package com.skyg0d.shop.shiny.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
