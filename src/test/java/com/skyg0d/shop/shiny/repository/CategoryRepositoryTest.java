@@ -20,7 +20,7 @@ public class CategoryRepositoryTest {
     CategoryRepository categoryRepository;
 
     @Test
-    @DisplayName("findBySlug returns category when successful")
+    @DisplayName("findBySlug Returns Category When Successful")
     void findBySlug_ReturnsCategory_WhenSuccessful() {
         categoryRepository.save(createCategoryToBeSave());
 
@@ -34,7 +34,7 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsBySlug returns true when successful")
+    @DisplayName("existsBySlug Returns True When Successful")
     void existsBySlug_ReturnsTrue_WhenSuccessful() {
         categoryRepository.save(createCategoryToBeSave());
 
@@ -44,7 +44,7 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsBySlug returns false when category do not exists")
+    @DisplayName("existsBySlug Returns False When Category don't Exists")
     void existsBySlug_ReturnsFalse_WhenDoNotExists() {
         Boolean categoryExists = categoryRepository.existsBySlug(SLUG);
 

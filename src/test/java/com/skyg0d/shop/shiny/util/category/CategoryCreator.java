@@ -8,9 +8,9 @@ public class CategoryCreator {
 
     public static final String NAME = "Test Category";
 
-    public static final String DESCRIPTION = "Test Description";
+    public static final String DESCRIPTION = "Test Category Description";
 
-    public static final String THUMBNAIL = "Test Thumbnail";
+    public static final String THUMBNAIL = "test-category-thumbnail";
 
     public static Category createCategoryToBeSave() {
         return Category

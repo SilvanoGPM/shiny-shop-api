@@ -23,7 +23,7 @@ public class UserRepositoryTest {
     RoleRepository roleRepository;
 
     @Test
-    @DisplayName("findByUsername returns user when successful")
+    @DisplayName("findByUsername Returns User When Successful")
     void findByUsername_ReturnsUser_WhenSuccessful() {
         User userToBeSave = createUserToBeSave();
 
@@ -41,7 +41,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByEmail returns true when email already exists")
+    @DisplayName("existsByEmail Returns True When Email Already Exists")
     void existsByEmail_ReturnsTrue_WhenEmailAlreadyExists() {
         User userToBeSave = createUserToBeSave();
 
@@ -55,7 +55,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByEmail returns true when email don't exists")
+    @DisplayName("existsByEmail Returns False When Email Don't Exists")
     void existsByEmail_ReturnsFalse_WhenEmailDoNotExists() {
         boolean userExists = userRepository.existsByEmail(createUserToBeSave().getEmail());
 
