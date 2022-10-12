@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.payload.request;
 
-import com.skyg0d.shop.shiny.model.Category;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -34,7 +33,7 @@ public class ReplaceProductRequest {
     @PositiveOrZero
     private long amount;
 
-    private Set<Category> categories;
+    private Set<String> categories;
 
     private Set<String> images;
 

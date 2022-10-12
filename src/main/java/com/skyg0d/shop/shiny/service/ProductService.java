@@ -1,8 +1,11 @@
 package com.skyg0d.shop.shiny.service;
 
+import com.skyg0d.shop.shiny.exception.BadRequestException;
+import com.skyg0d.shop.shiny.exception.ProductCategoryNotFoundException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.mapper.ProductMapper;
+import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
@@ -15,12 +18,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
 
     private final ProductMapper mapper = ProductMapper.INSTANCE;
 
@@ -51,7 +58,10 @@ public class ProductService {
     public UserProductResponse create(CreateProductRequest request) {
         verifySlugExists(request.getSlug());
 
-        Product productSaved = productRepository.save(mapper.toProduct(request));
+        Product productMapped = mapper.toProduct(request);
+        productMapped.setCategories(getCategories(request.getCategories()));
+
+        Product productSaved = productRepository.save(productMapped);
 
         return mapper.toUserProductResponse(productSaved);
     }
@@ -60,7 +70,10 @@ public class ProductService {
         Product productFound = findBySlug(request.getSlug());
         Product productMapped = mapper.toProduct(request);
 
+        Set<Category> categories = getCategories(request.getCategories());
+
         productMapped.setId(productFound.getId());
+        productMapped.setCategories(categories);
 
         productRepository.save(productMapped);
     }
@@ -88,8 +101,42 @@ public class ProductService {
         productRepository.save(productFound);
     }
 
+    public void addCategory(String productSlug, String categorySlug) {
+        Product productFound = findBySlug(productSlug);
+        Category categoryFound = categoryService.findBySlug(categorySlug);
+
+        productFound.getCategories().add(categoryFound);
+
+        productRepository.save(productFound);
+    }
+
+    public void removeCategory(String productSlug, String categorySlug) {
+        Product productFound = findBySlug(productSlug);
+
+        Predicate<Category> existsCategory = (category) -> category.getSlug().equalsIgnoreCase(categorySlug);
+
+        boolean hasCategory = productFound.getCategories()
+                .stream()
+                .anyMatch(existsCategory);
+
+        if (!hasCategory) {
+            throw new ProductCategoryNotFoundException(productSlug, categorySlug);
+        }
+
+        productFound.getCategories().removeIf(existsCategory);
+
+        productRepository.save(productFound);
+    }
+
     public void delete(String slug) {
         productRepository.delete(findBySlug(slug));
+    }
+
+    private Set<Category> getCategories(Set<String> categories) {
+        return categories
+                .stream()
+                .map(categoryService::findBySlug)
+                .collect(Collectors.toSet());
     }
 
 }

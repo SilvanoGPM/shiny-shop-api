@@ -61,6 +61,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Already Exists");
     }
 
+    @ExceptionHandler(ProductCategoryNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleProductCategoryNotFoundException(ProductCategoryNotFoundException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Category Not Found");
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDetails handleBadCredentialsException(BadCredentialsException ex) {

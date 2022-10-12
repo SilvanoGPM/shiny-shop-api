@@ -94,6 +94,22 @@ public class ProductController {
         return ResponseEntity.ok(new MessageResponse("Product amount changed!"));
     }
 
+    @PatchMapping("/{productSlug}/add/{categorySlug}/category")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
+        productService.addCategory(productSlug, categorySlug);
+
+        return ResponseEntity.ok(new MessageResponse("Add category to product!"));
+    }
+
+    @PatchMapping("/{productSlug}/remove/{categorySlug}/category")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
+        productService.removeCategory(productSlug, categorySlug);
+
+        return ResponseEntity.ok(new MessageResponse("Remove product category!"));
+    }
+
     @DeleteMapping("/{slug}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
