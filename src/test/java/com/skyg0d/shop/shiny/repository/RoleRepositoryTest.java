@@ -12,7 +12,7 @@ import static com.skyg0d.shop.shiny.util.role.RoleCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@DisplayName("Tests for RefreshTokenRepository")
+@DisplayName("Tests for RoleRepository")
 public class RoleRepositoryTest {
 
     @Autowired
