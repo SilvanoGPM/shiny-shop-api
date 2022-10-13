@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -33,7 +34,7 @@ public class ReplaceProductRequest {
     @PositiveOrZero
     private long amount;
 
-    private Set<String> categories;
+    private Set<String> categories = new HashSet<>();
 
     private Set<String> images;
 

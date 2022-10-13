@@ -1,9 +1,17 @@
 package com.skyg0d.shop.shiny.util.product;
 
+import com.skyg0d.shop.shiny.mapper.ProductMapper;
+import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
+import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
+import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
+import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProductCreator {
 
@@ -31,6 +39,7 @@ public class ProductCreator {
                 .images(IMAGES)
                 .sizes(SIZES)
                 .features(FEATURES)
+                .categories(new HashSet<>())
                 .build();
     }
 
@@ -47,6 +56,49 @@ public class ProductCreator {
                 .images(IMAGES)
                 .sizes(SIZES)
                 .features(FEATURES)
+                .categories(new HashSet<>())
+                .build();
+    }
+
+    public static AdminProductResponse createAdminProductResponse() {
+        return ProductMapper.INSTANCE.toAdminProductResponse(createProduct());
+    }
+
+    public static UserProductResponse createUserProductResponse() {
+        return ProductMapper.INSTANCE.toUserProductResponse(createProduct());
+    }
+
+    public static CreateProductRequest createCreateProductRequest() {
+        return CreateProductRequest
+                .builder()
+                .slug(SLUG)
+                .name(NAME)
+                .description(DESCRIPTION)
+                .thumbnail(THUMBNAIL)
+                .brand(BRAND)
+                .price(PRICE)
+                .amount(AMOUNT)
+                .images(new HashSet<>(IMAGES))
+                .sizes(new HashSet<>(SIZES))
+                .features(new HashSet<>(FEATURES))
+                .categories(Set.of())
+                .build();
+    }
+
+    public static ReplaceProductRequest createReplaceProductRequest() {
+        return ReplaceProductRequest
+                .builder()
+                .slug(SLUG)
+                .name(NAME)
+                .description(DESCRIPTION)
+                .thumbnail(THUMBNAIL)
+                .brand(BRAND)
+                .price(PRICE)
+                .amount(AMOUNT)
+                .images(new HashSet<>(IMAGES))
+                .sizes(new HashSet<>(SIZES))
+                .features(new HashSet<>(FEATURES))
+                .categories(new HashSet<>())
                 .build();
     }
 

@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.service;
 
-import com.skyg0d.shop.shiny.exception.BadRequestException;
 import com.skyg0d.shop.shiny.exception.ProductCategoryNotFoundException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
@@ -17,7 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.lang.module.ResolutionException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
