@@ -45,15 +45,15 @@ public class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        PageImpl<Product> usersPage = new PageImpl<>(List.of(createProduct()));
+        PageImpl<Product> productsPage = new PageImpl<>(List.of(createProduct()));
 
         BDDMockito
                 .when(productRepository.findAll(ArgumentMatchers.any(Pageable.class)))
-                .thenReturn(usersPage);
+                .thenReturn(productsPage);
 
         BDDMockito
                 .when(productRepository.findAllByActiveTrue(ArgumentMatchers.any(Pageable.class)))
-                .thenReturn(usersPage);
+                .thenReturn(productsPage);
 
         BDDMockito
                 .when(productRepository.findBySlug(ArgumentMatchers.anyString()))

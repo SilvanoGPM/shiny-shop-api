@@ -12,6 +12,7 @@ import com.skyg0d.shop.shiny.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,15 +32,15 @@ public class ProductController {
         return ResponseEntity.ok(productService.listAllActive(pageable));
     }
 
-    @GetMapping("/{slug}")
-    public ResponseEntity<UserProductResponse> findBySlug(@PathVariable String slug) {
-        return ResponseEntity.ok(productService.findBySlugMapped(slug));
-    }
-
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<AdminProductResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(productService.listAll(pageable));
+    }
+
+    @GetMapping("/{slug}")
+    public ResponseEntity<UserProductResponse> findBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(productService.findBySlugMapped(slug));
     }
 
     @GetMapping("/{slug}/exists")
@@ -59,7 +60,7 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
-        return ResponseEntity.ok(productService.create(request));
+        return new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
     }
 
     @PutMapping

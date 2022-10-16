@@ -27,7 +27,6 @@ import java.util.List;
 
 import static com.skyg0d.shop.shiny.util.category.CategoryCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Tests for CategoryController")
