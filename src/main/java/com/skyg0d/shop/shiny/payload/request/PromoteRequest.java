@@ -15,6 +15,6 @@ public class PromoteRequest {
     @Schema(description = "Roles to promote user")
     private Set<String> roles;
 
-    private String userId;
+    private String email;
 
 }

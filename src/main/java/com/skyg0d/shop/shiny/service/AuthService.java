@@ -2,20 +2,21 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.TokenRefreshException;
 import com.skyg0d.shop.shiny.exception.UserAlreadyExistsException;
+import com.skyg0d.shop.shiny.mapper.UserMapper;
 import com.skyg0d.shop.shiny.model.ERole;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.Role;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.repository.UserRepository;
-import com.skyg0d.shop.shiny.security.jwt.JwtUtils;
-import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
 import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
+import com.skyg0d.shop.shiny.repository.UserRepository;
+import com.skyg0d.shop.shiny.security.jwt.JwtUtils;
+import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +40,8 @@ public class AuthService {
     final PasswordEncoder passwordEncoder;
     final JwtUtils jwtUtils;
     final RefreshTokenService refreshTokenService;
+
+    final UserMapper mapper = UserMapper.INSTANCE;
 
     public JwtResponse signIn(LoginRequest loginRequest, UserMachineDetails userMachineDetails) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -58,7 +60,7 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        RefreshToken refreshToken = refreshTokenService.create(userDetails.getId(), userMachineDetails);
+        RefreshToken refreshToken = refreshTokenService.create(userDetails.getEmail(), userMachineDetails);
 
         return JwtResponse
                 .builder()
@@ -71,24 +73,17 @@ public class AuthService {
                 .build();
     }
 
-    public MessageResponse signUp(SignupRequest signUpRequest) {
+    public UserResponse signUp(SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new UserAlreadyExistsException(signUpRequest.getEmail());
         }
 
         Set<Role> roles = Set.of(roleService.findByName(ERole.ROLE_USER));
 
-        User user = User
-                .builder()
-                .username(signUpRequest.getUsername())
-                .email(signUpRequest.getEmail())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .roles(roles)
-                .build();
+        User user = mapper.toUser(signUpRequest);
+        user.setRoles(roles);
 
-        userRepository.save(user);
-
-        return new MessageResponse("User registered successfully!");
+        return mapper.toUserResponse(userRepository.save(user));
     }
 
     public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
@@ -104,10 +99,8 @@ public class AuthService {
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 
-    public MessageResponse logout(UUID userId) {
-        refreshTokenService.deleteByUserId(userId);
-
-        return new MessageResponse("Log out successful");
+    public void logout(String email) {
+        refreshTokenService.deleteByUserId(email);
     }
 
 }

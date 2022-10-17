@@ -25,14 +25,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ExceptionDetails> handleException(Exception ex) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        return new ResponseEntity<>(ExceptionDetails.createExceptionDetails(ex, status), status);
-    }
-
     @ExceptionHandler(TokenRefreshException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ExceptionDetails handleTokenRefreshException(TokenRefreshException ex) {

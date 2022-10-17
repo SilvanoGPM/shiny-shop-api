@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.payload.response;
 
-import com.skyg0d.shop.shiny.model.Category;
 import lombok.*;
 
 import java.math.BigDecimal;

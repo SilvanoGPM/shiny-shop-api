@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.service;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.model.ERole;
 import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +22,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.role.RoleCreator.createRole;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.createReplaceUserRequest;
 import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
 import static org.assertj.core.api.Assertions.*;
 
@@ -51,7 +52,7 @@ public class UserServiceTest {
                 .thenReturn(usersPage);
 
         BDDMockito
-                .when(userRepository.findById(ArgumentMatchers.any(UUID.class)))
+                .when(userRepository.findByEmail(ArgumentMatchers.anyString()))
                 .thenReturn(Optional.of(createUser()));
 
         BDDMockito
@@ -64,41 +65,79 @@ public class UserServiceTest {
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
         User expectedUser = createUser();
 
-        Page<User> usersPage = userService.listAll(PageRequest.of(0, 1));
+        Page<UserResponse> usersPage = userService.listAll(PageRequest.of(0, 1));
 
-        assertThat(usersPage)
-                .isNotEmpty()
-                .contains(expectedUser);
+        assertThat(usersPage).isNotEmpty();
+
+        assertThat(usersPage.getContent()).isNotEmpty();
+
+        assertThat(usersPage.getContent().get(0)).isNotNull();
+
+        assertThat(usersPage.getContent().get(0).getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test
-    @DisplayName("findById Returns User When Successful")
-    void findById_ReturnsUser_WhenSuccessful() {
+    @DisplayName("findByEmail Returns User When Successful")
+    void findByEmail_ReturnsUser_WhenSuccessful() {
         User expectedUser = createUser();
 
-        User foundUser = userService.findById(UUID.randomUUID());
+        User foundUser = userService.findByEmail(expectedUser.getEmail());
 
-        assertThat(foundUser).isEqualTo(expectedUser);
+        assertThat(foundUser).isNotNull();
+
+        assertThat(foundUser.getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test
-    @DisplayName("findById Throws ResourceNotFoundException When User Not Found")
-    void findById_ThrowsResourceNotFoundException_WhenUserNotFound() {
+    @DisplayName("findByEmail Throws ResourceNotFoundException When User Not Found")
+    void findByEmail_ThrowsResourceNotFoundException_WhenUserNotFound() {
         BDDMockito
-                .when(userRepository.findById(ArgumentMatchers.any(UUID.class)))
+                .when(userRepository.findByEmail(ArgumentMatchers.anyString()))
                 .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> userService.findById(UUID.randomUUID()));
+                .isThrownBy(() -> userService.findByEmail("some-email"));
+    }
+
+    @Test
+    @DisplayName("findByEmailMapped Returns User When Successful")
+    void findByEmailMapped_ReturnsUser_WhenSuccessful() {
+        User expectedUser = createUser();
+
+        UserResponse foundUser = userService.findByEmailMapped(expectedUser.getEmail());
+
+        assertThat(foundUser).isNotNull();
+
+        assertThat(foundUser.getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("findByEmailMapped Throws ResourceNotFoundException When User Not Found")
+    void findByEmailMapped_ThrowsResourceNotFoundException_WhenUserNotFound() {
+        BDDMockito
+                .when(userRepository.findByEmail(ArgumentMatchers.anyString()))
+                .thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ResourceNotFoundException.class)
+                .isThrownBy(() -> userService.findByEmailMapped("some-email"));
+    }
+
+    @Test
+    @DisplayName("replace Updates User When Successful")
+    void replace_UpdatesUser_WhenSuccessful() {
+        assertThatCode(() -> userService.replace(createReplaceUserRequest()))
+                .doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("promote Updates User Roles When Successful")
     void promote_UpdatesUserRoles_WhenSuccessful() {
-        assertThatCode(() -> userService.promote(UUID.randomUUID(), Set.of("admin")))
+        User expectedUser = createUser();
+
+        assertThatCode(() -> userService.promote(expectedUser.getEmail(), Set.of("admin")))
                 .doesNotThrowAnyException();
 
-        assertThatCode(() -> userService.promote(UUID.randomUUID(), Set.of()))
+        assertThatCode(() -> userService.promote(expectedUser.getEmail(), Set.of()))
                 .doesNotThrowAnyException();
     }
 

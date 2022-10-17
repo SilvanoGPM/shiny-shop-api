@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.service.AuthService;
 import com.skyg0d.shop.shiny.service.RefreshTokenService;
@@ -25,12 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.token.RefreshTokenCreator.createRefreshToken;
 import static com.skyg0d.shop.shiny.util.token.RefreshTokenCreator.createUserTokenResponse;
-import static com.skyg0d.shop.shiny.util.user.UserCreator.createPromoteRequest;
-import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -51,8 +50,8 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        PageImpl<User> usersPage = new PageImpl<>(List.of(
-                createUser()
+        PageImpl<UserResponse> usersPage = new PageImpl<>(List.of(
+                createUserResponse()
         ));
 
         PageImpl<RefreshToken> refreshTokensPage = new PageImpl<>(List.of(
@@ -72,32 +71,42 @@ public class UserControllerTest {
                 .thenReturn(refreshTokensPage);
 
         BDDMockito
-                .when(refreshTokenService.listAllByUser(ArgumentMatchers.any(Pageable.class), ArgumentMatchers.any(UUID.class)))
+                .when(refreshTokenService.listAllByUser(ArgumentMatchers.any(Pageable.class), ArgumentMatchers.anyString()))
                 .thenReturn(userRefreshTokensPage);
 
         BDDMockito
-                .when(userService.promote(ArgumentMatchers.any(UUID.class), ArgumentMatchers.any()))
-                .thenReturn(new MessageResponse("User promoted"));
+                .when(userService.findByEmailMapped(ArgumentMatchers.anyString()))
+                .thenReturn(createUserResponse());
 
         BDDMockito
-                .when(authService.logout(ArgumentMatchers.any(UUID.class)))
-                .thenReturn(new MessageResponse("Log out successful"));
+                .doNothing()
+                .when(userService)
+                .promote(ArgumentMatchers.anyString(), ArgumentMatchers.any());
+
+        BDDMockito
+                .doNothing()
+                .when(authService)
+                .logout(ArgumentMatchers.anyString());
     }
 
     @Test
     @DisplayName("listAll Returns List Of Users Inside Page Object When Successful")
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
-        User expectedUser = createUser();
+        UserResponse expectedUser = createUserResponse();
 
-        ResponseEntity<Page<User>> entity = userController.listAll(PageRequest.of(0, 1));
+        ResponseEntity<Page<UserResponse>> entity = userController.listAll(PageRequest.of(0, 1));
 
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(entity.getBody())
-                .isNotEmpty()
-                .contains(expectedUser);
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test
@@ -143,9 +152,41 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("findByEmail Returns User When Successful")
+    void findByEmail_ReturnsUser_WhenSuccessful() {
+        User expectedUser = createUser();
+
+        ResponseEntity<UserResponse> entity = userController.findByEmail(expectedUser.getEmail());
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("replace Updates User When Successful")
+    void replace_UpdatesUser_WhenSuccessful() {
+        String expectedMessage = "User replaced!";
+
+        ResponseEntity<MessageResponse> entity = userController.replace(createReplaceUserRequest());
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+    }
+
+    @Test
     @DisplayName("promote Updates User Roles When Successful")
     void promote_UpdatesUserRoles_WhenSuccessful() {
-        String expectedMessage = "User promoted";
+        String expectedMessage = "User promoted!";
 
         ResponseEntity<MessageResponse> entity = userController.promote(createPromoteRequest());
 
@@ -163,7 +204,7 @@ public class UserControllerTest {
     void logout_RemovesRefreshToken_WhenSuccessful() {
         String expectedMessage = "Log out successful";
 
-        ResponseEntity<MessageResponse> entity = userController.logout(UUID.randomUUID());
+        ResponseEntity<MessageResponse> entity = userController.logout("some-email");
 
         assertThat(entity).isNotNull();
 

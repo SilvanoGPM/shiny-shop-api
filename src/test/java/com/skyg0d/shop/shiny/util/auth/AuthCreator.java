@@ -14,6 +14,7 @@ import java.util.List;
 public class AuthCreator {
 
     public static final String USERNAME = "username";
+    public static final String FULL_NAME = "username";
 
     public static final String EMAIL = "user@mail.com";
 
@@ -34,6 +35,7 @@ public class AuthCreator {
         return SignupRequest
                 .builder()
                 .email(EMAIL)
+                .fullName(FULL_NAME)
                 .username(USERNAME)
                 .password(PASSWORD)
                 .build();

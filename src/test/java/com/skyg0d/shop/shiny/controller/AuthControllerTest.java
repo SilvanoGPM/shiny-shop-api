@@ -8,22 +8,25 @@ import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.service.AuthService;
 import com.skyg0d.shop.shiny.util.MockUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.UUID;
-
 import static com.skyg0d.shop.shiny.util.auth.AuthCreator.*;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.createUserResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -45,15 +48,16 @@ public class AuthControllerTest {
 
         BDDMockito
                 .when(authService.signUp(ArgumentMatchers.any(SignupRequest.class)))
-                .thenReturn(new MessageResponse("User registered successfully!"));
+                .thenReturn(createUserResponse());
 
         BDDMockito
                 .when(authService.refreshToken(ArgumentMatchers.any(TokenRefreshRequest.class)))
                 .thenReturn(createTokenRefreshResponse());
 
         BDDMockito
-                .when(authService.logout(ArgumentMatchers.any(UUID.class)))
-                .thenReturn(new MessageResponse("Log out successful"));
+                .doNothing()
+                .when(authService)
+                .logout(ArgumentMatchers.anyString());
     }
 
     @Test
@@ -77,11 +81,11 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("signUp_SaveUser_WhenSuccessful")
-    void signUp_SaveUser_WhenSuccessful() {
-        String expectedMessage = "User registered successfully!";
+    @DisplayName("signUp_PersistsUser_WhenSuccessful")
+    void signUp_PersistsUser_WhenSuccessful() {
+        UserResponse expectedUser = createUserResponse();
 
-        ResponseEntity<MessageResponse> entity = authController.signUp(createSignupRequest());
+        ResponseEntity<UserResponse> entity = authController.signUp(createSignupRequest());
 
         assertThat(entity).isNotNull();
 
@@ -91,7 +95,9 @@ public class AuthControllerTest {
 
         assertThat(entity.getBody()).isNotNull();
 
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test

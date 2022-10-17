@@ -1,14 +1,15 @@
 package com.skyg0d.shop.shiny.integration;
 
+import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
 import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
 import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
 import com.skyg0d.shop.shiny.repository.UserRepository;
 import com.skyg0d.shop.shiny.util.JWTCreator;
@@ -70,17 +71,16 @@ public class AuthControllerIT {
     @Test
     @DisplayName("signUp_SaveUser_WhenSuccessful")
     void signUp_SaveUser_WhenSuccessful() {
-        String expectedMessage = "User registered successfully!";
-
         SignupRequest signup = SignupRequest
                 .builder()
                 .email("some@mail.com")
+                .fullName("Some name")
                 .password("password")
                 .username("username")
                 .build();
 
-        ResponseEntity<MessageResponse> entity = httpClient
-                .postForEntity("/auth/signup", new HttpEntity<>(signup), MessageResponse.class);
+        ResponseEntity<UserResponse> entity = httpClient
+                .postForEntity("/auth/signup", new HttpEntity<>(signup), UserResponse.class);
 
         assertThat(entity).isNotNull();
 
@@ -90,7 +90,7 @@ public class AuthControllerIT {
 
         assertThat(entity.getBody()).isNotNull();
 
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody().getEmail()).isEqualTo(signup.getEmail());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AuthControllerIT {
     void refreshToken_ReturnsTokenRefresh_WhenSuccessful() {
         jwtCreator.createAdminAuthEntity(null);
 
-        String token = getUserToken("admin@mail.com");
+        String token = getAdminToken();
 
         TokenRefreshRequest request = TokenRefreshRequest
                 .builder()
@@ -156,15 +156,13 @@ public class AuthControllerIT {
         assertThat(entity.getBody().getDetails()).isEqualTo("You are not logged in.");
     }
 
-    private String getUserToken(String email) {
-        Page<RefreshToken> allByUser = tokenRepository.findAllByUser(PageRequest.of(0, 1), findUserByEmail(email));
-        return allByUser.getContent().get(0).getToken();
-    }
-
-    private User findUserByEmail(String email) throws RuntimeException {
-        return userRepository
-                .findByEmail(email)
+    private String getAdminToken() throws RuntimeException {
+        User user = userRepository
+                .findByEmail("admin@mail.com")
                 .orElseThrow(RuntimeException::new);
+
+        Page<RefreshToken> allByUser = tokenRepository.findAllByUser(PageRequest.of(0, 1), user);
+        return allByUser.getContent().get(0).getToken();
     }
 
 }

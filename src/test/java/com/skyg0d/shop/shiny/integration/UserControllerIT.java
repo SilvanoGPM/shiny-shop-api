@@ -4,6 +4,7 @@ import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
 import com.skyg0d.shop.shiny.repository.UserRepository;
@@ -47,7 +48,7 @@ public class UserControllerIT {
     @Test
     @DisplayName("listAll Returns List Of Users Inside Page Object When Successful")
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
-        ResponseEntity<PageableResponse<User>> entity = httpClient.exchange(
+        ResponseEntity<PageableResponse<UserResponse>> entity = httpClient.exchange(
                 "/users",
                 HttpMethod.GET,
                 jwtCreator.createAdminAuthEntity(null),
@@ -120,12 +121,12 @@ public class UserControllerIT {
     @Test
     @DisplayName("promote Updates User Roles When Successful")
     void promote_UpdatesUserRoles_WhenSuccessful() {
-        String expectedMessage = "User promoted";
+        String expectedMessage = "User promoted!";
 
         PromoteRequest promoteRequest = PromoteRequest
                 .builder()
                 .roles(Set.of("mod"))
-                .userId(findUserByEmail("user@mail.com").getId().toString())
+                .email(findUserByEmail("user@mail.com").getEmail())
                 .build();
 
         ResponseEntity<MessageResponse> entity = httpClient.exchange(
@@ -149,14 +150,14 @@ public class UserControllerIT {
     void logout_RemovesRefreshToken_WhenSuccessful() {
         String expectedMessage = "Log out successful";
 
-        String userId = findUserByEmail("user@mail.com").getId().toString();
+        String email = findUserByEmail("user@mail.com").getEmail();
 
         ResponseEntity<MessageResponse> entity = httpClient.exchange(
-                "/users/logout/{userId}",
+                "/users/logout/{email}",
                 HttpMethod.DELETE,
                 jwtCreator.createAdminAuthEntity(null),
                 MessageResponse.class,
-                userId
+                email
         );
 
         assertThat(entity).isNotNull();

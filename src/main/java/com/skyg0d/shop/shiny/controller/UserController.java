@@ -1,9 +1,10 @@
 package com.skyg0d.shop.shiny.controller;
 
 import com.skyg0d.shop.shiny.model.RefreshToken;
-import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
+import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.AuthService;
@@ -21,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -43,8 +43,21 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<User>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<UserResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(userService.listAll(pageable));
+    }
+
+    @GetMapping("/{email}")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @Operation(summary = "Find user by email", tags = "Users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<UserResponse> findByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.findByEmailMapped(email));
     }
 
     @GetMapping("/tokens")
@@ -74,7 +87,23 @@ public class UserController {
                 .getAuthentication()
                 .getPrincipal();
 
-        return ResponseEntity.ok(refreshTokenService.listAllByUser(pageable, userDetails.getId()));
+        return ResponseEntity.ok(refreshTokenService.listAllByUser(pageable, userDetails.getEmail()));
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('ADMIN') or #request.email == authentication.principal.email")
+    @Operation(summary = "Promote user to others roles", tags = "Users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "400", description = "When user not found"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceUserRequest request) {
+        userService.replace(request);
+
+        return ResponseEntity.ok(new MessageResponse("User replaced!"));
     }
 
     @PatchMapping("/promote")
@@ -88,10 +117,12 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "When server error")
     })
     public ResponseEntity<MessageResponse> promote(@Valid @RequestBody PromoteRequest request) {
-        return ResponseEntity.ok(userService.promote(UUID.fromString(request.getUserId()), request.getRoles()));
+        userService.promote(request.getEmail(), request.getRoles());
+
+        return ResponseEntity.ok(new MessageResponse("User promoted!"));
     }
 
-    @DeleteMapping("/logout/{userId}")
+    @DeleteMapping("/logout/{email}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "User logout", tags = "Users")
     @ApiResponses({
@@ -101,8 +132,10 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> logout(@PathVariable UUID userId) {
-        return ResponseEntity.ok(authService.logout(userId));
+    public ResponseEntity<MessageResponse> logout(@PathVariable String email) {
+        authService.logout(email);
+
+        return ResponseEntity.ok(new MessageResponse("Log out successful"));
     }
 
 }

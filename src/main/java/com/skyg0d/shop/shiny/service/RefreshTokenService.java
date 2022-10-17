@@ -3,9 +3,9 @@ package com.skyg0d.shop.shiny.service;
 import com.skyg0d.shop.shiny.exception.TokenRefreshException;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
+import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -31,8 +31,8 @@ public class RefreshTokenService {
         return refreshTokenRepository.findAll(pageable);
     }
 
-    public Page<UserTokenResponse> listAllByUser(Pageable pageable, UUID userId) {
-        User user = userService.findById(userId);
+    public Page<UserTokenResponse> listAllByUser(Pageable pageable, String email) {
+        User user = userService.findByEmail(email);
 
         return refreshTokenRepository.findAllByUser(pageable, user).map((UserTokenResponse::new));
     }
@@ -41,18 +41,10 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
-    public RefreshToken create(UUID userId, UserMachineDetails userMachineDetails) {
-        User user = userService.findById(userId);
+    public RefreshToken create(String email, UserMachineDetails userMachineDetails) {
+        User user = userService.findByEmail(email);
 
-        RefreshToken refreshToken = RefreshToken
-                .builder()
-                .token(UUID.randomUUID().toString())
-                .user(user)
-                .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
-                .ipAddress(userMachineDetails.getIpAddress())
-                .browser(userMachineDetails.getBrowser())
-                .operatingSystem(userMachineDetails.getOperatingSystem())
-                .build();
+        RefreshToken refreshToken = RefreshToken.builder().token(UUID.randomUUID().toString()).user(user).expiryDate(Instant.now().plusMillis(refreshTokenDurationMs)).ipAddress(userMachineDetails.getIpAddress()).browser(userMachineDetails.getBrowser()).operatingSystem(userMachineDetails.getOperatingSystem()).build();
 
         return refreshTokenRepository.save(refreshToken);
     }
@@ -70,8 +62,8 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void deleteByUserId(UUID userId) {
-        refreshTokenRepository.deleteByUser(userService.findById(userId));
+    public void deleteByUserId(String email) {
+        refreshTokenRepository.deleteByUser(userService.findByEmail(email));
     }
 
 }

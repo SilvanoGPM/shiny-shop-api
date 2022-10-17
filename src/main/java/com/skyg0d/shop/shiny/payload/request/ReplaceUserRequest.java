@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.skyg0d.shop.shiny.model.Address;
 import lombok.*;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -13,25 +12,20 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SignupRequest {
+public class ReplaceUserRequest {
 
     @NotBlank
-    @Size(min = 3, max = 20)
-    private String username;
-
-    @NotBlank
-    @JsonProperty("full_name")
-    private String fullName;
-
-    @NotBlank
-    @Size(max = 50)
-    @Email
     private String email;
 
     @NotBlank
-    @Size(min = 6, max = 40)
-    private String password;
+    @Size(max = 100)
+    private String username;
+
+    @JsonProperty("full_name")
+    private String fullName;
 
     private Address address;
+
+    private String photoURL;
 
 }

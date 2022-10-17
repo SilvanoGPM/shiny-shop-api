@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.controller;
 
-import com.skyg0d.shop.shiny.util.HttpUtils;
 import com.skyg0d.shop.shiny.exception.BadRequestException;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.request.LoginRequest;
@@ -9,8 +8,10 @@ import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.AuthService;
+import com.skyg0d.shop.shiny.util.HttpUtils;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,7 +63,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "When email already exists"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> signUp(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<UserResponse> signUp(@Valid @RequestBody SignupRequest signUpRequest) {
         return new ResponseEntity<>(authService.signUp(signUpRequest), HttpStatus.CREATED);
     }
 
@@ -94,7 +95,9 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
 
-        return ResponseEntity.ok(authService.logout(userDetails.getId()));
+        authService.logout(userDetails.getEmail());
+
+        return ResponseEntity.ok(new MessageResponse("Log out successful"));
     }
 
 }

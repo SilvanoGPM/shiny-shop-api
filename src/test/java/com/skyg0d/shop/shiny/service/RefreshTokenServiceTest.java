@@ -1,11 +1,11 @@
 package com.skyg0d.shop.shiny.service;
 
+import com.skyg0d.shop.shiny.exception.TokenRefreshException;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.util.token.RefreshTokenCreator;
-import com.skyg0d.shop.shiny.exception.TokenRefreshException;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
+import com.skyg0d.shop.shiny.util.token.RefreshTokenCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.GenericCreator.createUserMachineDetails;
 import static org.assertj.core.api.Assertions.*;
@@ -52,7 +51,7 @@ public class RefreshTokenServiceTest {
                 .thenReturn(tokensPage);
 
         BDDMockito
-                .when(userService.findById(ArgumentMatchers.any(UUID.class)))
+                .when(userService.findByEmail(ArgumentMatchers.anyString()))
                 .thenReturn(RefreshTokenCreator.createRefreshToken().getUser());
 
         BDDMockito
@@ -92,7 +91,7 @@ public class RefreshTokenServiceTest {
     void listAllByUser_ReturnsListOfUserTokenInsidePageObject_WhenSuccessful() {
         RefreshToken expectedToken = RefreshTokenCreator.createRefreshToken();
 
-        Page<UserTokenResponse> tokensPage = refreshTokenService.listAllByUser(PageRequest.of(0, 1), UUID.randomUUID());
+        Page<UserTokenResponse> tokensPage = refreshTokenService.listAllByUser(PageRequest.of(0, 1), "some-email");
 
         assertThat(tokensPage)
                 .isNotEmpty()
@@ -120,7 +119,7 @@ public class RefreshTokenServiceTest {
     void create_PersistsRefreshToken_WhenSuccessful() {
         RefreshToken expectedToken = RefreshTokenCreator.createRefreshToken();
 
-        RefreshToken savedRefreshToken = refreshTokenService.create(UUID.randomUUID(), createUserMachineDetails());
+        RefreshToken savedRefreshToken = refreshTokenService.create("some-email", createUserMachineDetails());
 
         assertThat(savedRefreshToken).isEqualTo(expectedToken);
     }
@@ -149,7 +148,7 @@ public class RefreshTokenServiceTest {
     @Test
     @DisplayName("deleteByUser Removes Token When Successful")
     void deleteByUser_RemovesToken_WhenSuccessful() {
-        assertThatCode(() -> refreshTokenService.deleteByUserId(RefreshTokenCreator.createRefreshToken().getUser().getId()))
+        assertThatCode(() -> refreshTokenService.deleteByUserId(RefreshTokenCreator.createRefreshToken().getUser().getEmail()))
                 .doesNotThrowAnyException();
     }
 

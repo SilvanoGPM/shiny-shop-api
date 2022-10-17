@@ -30,8 +30,17 @@ public class User extends BaseEntity {
     private String username;
 
     @NotBlank
-    @Size(max = 50)
+    @JsonProperty("full_name")
+    private String fullName;
+
+    @NotBlank
+    @Size(max = 100)
     private String email;
+
+    @Embedded
+    private Address address;
+
+    private String photoURL;
 
     @NotBlank
     @Size(max = 150)

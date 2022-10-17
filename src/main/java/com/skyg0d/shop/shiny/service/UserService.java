@@ -1,11 +1,13 @@
 package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
+import com.skyg0d.shop.shiny.mapper.UserMapper;
 import com.skyg0d.shop.shiny.model.Role;
 import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.UserRepository;
 import com.skyg0d.shop.shiny.util.RoleUtils;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,27 +25,43 @@ public class UserService {
 
     final RoleService roleService;
 
-    public Page<User> listAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    final UserMapper mapper = UserMapper.INSTANCE;
+
+    public Page<UserResponse> listAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(mapper::toUserResponse);
     }
 
-    public User findById(UUID id) throws ResourceNotFoundException {
+    public User findByEmail(String email) throws ResourceNotFoundException {
         return userRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-    public MessageResponse promote(UUID userId, Set<String> roles) {
-        User user = findById(userId);
+    public UserResponse findByEmailMapped(String email) throws ResourceNotFoundException {
+        return mapper.toUserResponse(findByEmail(email));
+    }
+
+    public void replace(ReplaceUserRequest request) {
+        User userFound = findByEmail(request.getEmail());
+
+        User userMapped = mapper.toUser(request);
+
+        userMapped.setId(userFound.getId());
+        userMapped.setRoles(userFound.getRoles());
+        userMapped.setPassword(userFound.getPassword());
+
+        userRepository.save(userMapped);
+    }
+
+    public void promote(String email, Set<String> roles) {
+        User user = findByEmail(email);
 
         user.setRoles(getUserRoles(roles));
 
         userRepository.save(user);
-
-        return new MessageResponse("User promoted");
     }
 
-    public Set<Role> getUserRoles(Set<String> roles) {
+    private Set<Role> getUserRoles(Set<String> roles) {
         Optional<Set<String>> optionalRoles = Optional.ofNullable(roles);
 
         Set<String> defaultRoles = Set.of("user");

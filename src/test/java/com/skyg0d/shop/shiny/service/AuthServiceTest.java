@@ -1,18 +1,20 @@
 package com.skyg0d.shop.shiny.service;
 
-import com.skyg0d.shop.shiny.model.ERole;
-import com.skyg0d.shop.shiny.model.RefreshToken;
-import com.skyg0d.shop.shiny.util.token.RefreshTokenCreator;
 import com.skyg0d.shop.shiny.exception.TokenRefreshException;
 import com.skyg0d.shop.shiny.exception.UserAlreadyExistsException;
+import com.skyg0d.shop.shiny.model.ERole;
+import com.skyg0d.shop.shiny.model.RefreshToken;
+import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
+import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.UserRepository;
 import com.skyg0d.shop.shiny.security.jwt.JwtUtils;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.auth.AuthCreator;
+import com.skyg0d.shop.shiny.util.token.RefreshTokenCreator;
+import com.skyg0d.shop.shiny.util.user.UserCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,14 +26,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.GenericCreator.createUserMachineDetails;
 import static com.skyg0d.shop.shiny.util.auth.AuthCreator.*;
 import static com.skyg0d.shop.shiny.util.auth.UserDetailsImplCreator.createUserDetails;
 import static com.skyg0d.shop.shiny.util.role.RoleCreator.createRole;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Tests for AuthService")
@@ -75,7 +76,7 @@ public class AuthServiceTest {
                 .thenReturn(AuthCreator.TOKEN);
 
         BDDMockito
-                .when(refreshTokenService.create(ArgumentMatchers.any(UUID.class), ArgumentMatchers.any(UserMachineDetails.class)))
+                .when(refreshTokenService.create(ArgumentMatchers.anyString(), ArgumentMatchers.any(UserMachineDetails.class)))
                 .thenReturn(RefreshTokenCreator.createRefreshToken());
 
         BDDMockito
@@ -89,6 +90,10 @@ public class AuthServiceTest {
         BDDMockito
                 .when(passwordEncoder.encode(ArgumentMatchers.any(CharSequence.class)))
                 .thenReturn(PASSWORD);
+
+        BDDMockito
+                .when(userRepository.save(ArgumentMatchers.any(User.class)))
+                .thenReturn(createUser());
 
         BDDMockito
                 .when(refreshTokenService.findByToken(ArgumentMatchers.anyString()))
@@ -105,7 +110,7 @@ public class AuthServiceTest {
         BDDMockito
                 .doNothing()
                 .when(refreshTokenService)
-                .deleteByUserId(ArgumentMatchers.any(UUID.class));
+                .deleteByUserId(ArgumentMatchers.anyString());
     }
 
     @Test
@@ -121,13 +126,11 @@ public class AuthServiceTest {
     @Test
     @DisplayName("signUp Persists User When Successful")
     void signUp_PersistsUser_WhenSuccessful() {
-        String expectedMessage = "User registered successfully!";
+        UserResponse userSaved = authService.signUp(createSignupRequest());
 
-        MessageResponse messageResponse = authService.signUp(createSignupRequest());
+        assertThat(userSaved).isNotNull();
 
-        assertThat(messageResponse).isNotNull();
-
-        assertThat(messageResponse.getMessage()).isEqualTo(expectedMessage);
+        assertThat(userSaved.getEmail()).isEqualTo(UserCreator.EMAIL);
     }
 
     @Test
@@ -169,13 +172,8 @@ public class AuthServiceTest {
     @Test
     @DisplayName("logout Removes Refresh Token When Successful")
     void logout_RemovesRefreshToken_WhenSuccessful() {
-        String expectedMessage = "Log out successful";
-
-        MessageResponse messageResponse = authService.logout(UUID.randomUUID());
-
-        assertThat(messageResponse).isNotNull();
-
-        assertThat(messageResponse.getMessage()).isEqualTo(expectedMessage);
+        assertThatCode(() -> authService.logout("some-email"))
+                .doesNotThrowAnyException();
     }
 
 }
