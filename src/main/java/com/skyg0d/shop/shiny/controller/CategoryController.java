@@ -35,7 +35,6 @@ public class CategoryController {
     }
 
     @GetMapping("/{slug}/exists")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> existsBySlug(@PathVariable String slug) {
         String message = "Category don't exists";
 
