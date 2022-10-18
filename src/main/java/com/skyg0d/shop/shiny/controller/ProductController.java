@@ -44,7 +44,6 @@ public class ProductController {
     }
 
     @GetMapping("/{slug}/exists")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> existsBySlug(@PathVariable String slug) {
         String message = "Product don't exists";
 

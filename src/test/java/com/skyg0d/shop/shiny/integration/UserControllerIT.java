@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.integration;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
+import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
@@ -25,6 +26,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.Set;
 
 import static com.skyg0d.shop.shiny.util.token.RefreshTokenCreator.createRefreshToken;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.createReplaceUserRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -116,6 +118,53 @@ public class UserControllerIT {
         assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedRefreshToken.getId().toString());
 
         assertThat(entity.getBody().getContent().get(0).getToken()).isEqualTo(expectedRefreshToken.getToken());
+    }
+
+    @Test
+    @DisplayName("findByEmail Returns User When Successful")
+    void findByEmail_ReturnsUser_WhenSuccessful() {
+        User expectedUser = jwtCreator.createUser();
+
+        ResponseEntity<UserResponse> entity = httpClient.exchange(
+                "/users/{email}",
+                HttpMethod.GET,
+                jwtCreator.createAdminAuthEntity(null),
+                UserResponse.class,
+                expectedUser.getEmail()
+        );
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("replace Updates User When Successful")
+    void replace_UpdatesUser_WhenSuccessful() {
+        String expectedMessage = "User replaced!";
+
+        ReplaceUserRequest request = createReplaceUserRequest();
+
+        request.setEmail(jwtCreator.createUser().getEmail());
+
+        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+                "/users",
+                HttpMethod.PUT,
+                jwtCreator.createAdminAuthEntity(request),
+                MessageResponse.class
+        );
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
     }
 
     @Test
