@@ -1,5 +1,8 @@
 package com.skyg0d.shop.shiny.controller;
 
+import com.skyg0d.shop.shiny.annotations.IsAdmin;
+import com.skyg0d.shop.shiny.annotations.IsStaff;
+import com.skyg0d.shop.shiny.annotations.IsUser;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
@@ -35,7 +38,7 @@ public class UserController {
     final RefreshTokenService refreshTokenService;
 
     @GetMapping
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @IsStaff
     @Operation(summary = "Returns all users with pagination", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
@@ -48,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @IsStaff
     @Operation(summary = "Find user by email", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
@@ -61,7 +64,7 @@ public class UserController {
     }
 
     @GetMapping("/tokens")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @IsStaff
     @Operation(summary = "Returns all users tokens with pagination", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
@@ -74,7 +77,7 @@ public class UserController {
     }
 
     @GetMapping("/my/tokens")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @IsUser
     @Operation(summary = "Returns all user tokens with pagination", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
@@ -107,7 +110,7 @@ public class UserController {
     }
 
     @PatchMapping("/promote")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     @Operation(summary = "Promote user to others roles", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
@@ -123,7 +126,7 @@ public class UserController {
     }
 
     @DeleteMapping("/logout/{email}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     @Operation(summary = "User logout", tags = "Users")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),

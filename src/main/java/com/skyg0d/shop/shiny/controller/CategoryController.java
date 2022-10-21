@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.controller;
 
+import com.skyg0d.shop.shiny.annotations.IsAdmin;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
@@ -48,13 +49,13 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CreateCategoryRequest request) {
         return new ResponseEntity<>(categoryService.create(request), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceCategoryRequest request) {
         categoryService.replace(request);
 
@@ -62,7 +63,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{slug}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
         categoryService.delete(slug);
 

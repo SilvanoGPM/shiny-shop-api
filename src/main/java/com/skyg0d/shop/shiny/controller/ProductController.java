@@ -1,5 +1,7 @@
 package com.skyg0d.shop.shiny.controller;
 
+import com.skyg0d.shop.shiny.annotations.IsAdmin;
+import com.skyg0d.shop.shiny.annotations.IsStaff;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
 import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
@@ -33,7 +35,7 @@ public class ProductController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<Page<AdminProductResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(productService.listAll(pageable));
     }
@@ -57,13 +59,13 @@ public class ProductController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
         return new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceProductRequest request) {
         productService.replace(request);
 
@@ -71,7 +73,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{slug}/toggle/active")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> toggleActive(@PathVariable String slug) {
         productService.toggleActive(slug);
 
@@ -79,7 +81,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{slug}/apply/discount")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) {
         productService.applyDiscount(slug, request.getDiscount());
 
@@ -87,7 +89,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{slug}/change/amount")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> changeAmount(@PathVariable String slug, @Valid @RequestBody ChangeAmountRequest request) {
         productService.changeAmount(slug, request.getAmount());
 
@@ -95,7 +97,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{productSlug}/add/{categorySlug}/category")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
         productService.addCategory(productSlug, categorySlug);
 
@@ -103,7 +105,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{productSlug}/remove/{categorySlug}/category")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
         productService.removeCategory(productSlug, categorySlug);
 
@@ -111,7 +113,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{slug}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
         productService.delete(slug);
 
