@@ -53,6 +53,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Already Exists");
     }
 
+    @ExceptionHandler(InactiveProductOnOrderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleInactiveProductOnOrderException(InactiveProductOnOrderException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Inactive Product On Order");
+    }
+
+    @ExceptionHandler(ProductOverflowAmountException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleProductOverflowAmountException(ProductOverflowAmountException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Amount Lacking");
+    }
+
     @ExceptionHandler(ProductCategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDetails handleProductCategoryNotFoundException(ProductCategoryNotFoundException ex) {

@@ -26,6 +26,7 @@ public class DefaultDataProps {
         private String email = "admin@mail.com";
         private String password = "admin123";
         private String username = "Admin";
+        private String fullName = "Admin";
 
     }
 

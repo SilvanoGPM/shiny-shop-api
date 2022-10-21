@@ -1,8 +1,8 @@
 package com.skyg0d.shop.shiny.security.config;
 
+import com.skyg0d.shop.shiny.security.jwt.AuthEntryPointJwt;
 import com.skyg0d.shop.shiny.security.jwt.AuthTokenFilter;
 import com.skyg0d.shop.shiny.security.service.UserDetailsServiceImpl;
-import com.skyg0d.shop.shiny.security.jwt.AuthEntryPointJwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
