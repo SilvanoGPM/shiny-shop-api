@@ -1,8 +1,6 @@
 package com.skyg0d.shop.shiny.service;
 
-import com.skyg0d.shop.shiny.exception.InactiveProductOnOrderException;
-import com.skyg0d.shop.shiny.exception.ProductOverflowAmountException;
-import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
+import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.mapper.OrderMapper;
 import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.model.Order;
@@ -13,6 +11,8 @@ import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
+import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +34,8 @@ public class OrderService {
     private final ProductService productService;
 
     private final UserService userService;
+
+    private final AuthUtils authUtils;
 
     private final OrderMapper mapper = OrderMapper.INSTANCE;
 
@@ -92,12 +94,42 @@ public class OrderService {
         return mapper.toOrderResponse(orderRepository.save(order));
     }
 
-    public void updateStatus(String id, EOrderStatus status) {
+    public void cancelOrder(String id) throws OrderStatusException {
         Order orderFound = findById(id);
 
-        orderFound.setStatus(status);
+        if (orderFound.getStatus().equals(EOrderStatus.DELIVERED)) {
+            throw new OrderStatusException("Order already delivered, could not cancel.");
+        }
 
-        orderRepository.save(orderFound);
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
+
+        boolean isOwner = userDetails.getEmail().equals(orderFound.getUser().getEmail());
+
+        boolean isAdmin = userDetails.getAuthorities().stream().anyMatch((authority) ->
+                authority.getAuthority().equals("ROLE_ADMIN")
+        );
+
+        if (!isOwner && !isAdmin) {
+            throw new OrderPermissionInsufficient();
+        }
+
+        updateStatus(orderFound, EOrderStatus.CANCELED);
+    }
+
+    public void adminChangeStatus(String id, EOrderStatus status, String errMessage) {
+        Order orderFound = findById(id);
+
+        if (orderFound.getStatus().equals(EOrderStatus.CANCELED)) {
+            throw new OrderStatusException(errMessage);
+        }
+
+        updateStatus(orderFound, status);
+    }
+
+    private void updateStatus(Order order, EOrderStatus status) {
+        order.setStatus(status);
+
+        orderRepository.save(order);
     }
 
     private List<ProductCalculate> getProducts(List<CreateOrderProduct> products) throws InactiveProductOnOrderException, ProductOverflowAmountException {

@@ -74,6 +74,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Product Category Not Found");
     }
 
+    @ExceptionHandler(OrderStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleOrderStatusException(OrderStatusException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Order Status Incorrect");
+    }
+
+    @ExceptionHandler(OrderPermissionInsufficient.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleOrderPermissionInsufficient(OrderPermissionInsufficient ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Order Permission Insufficient");
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDetails handleBadCredentialsException(BadCredentialsException ex) {

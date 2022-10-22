@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.controller;
 
-import com.skyg0d.shop.shiny.exception.BadRequestException;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
@@ -11,6 +10,7 @@ import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.AuthService;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.skyg0d.shop.shiny.util.HttpUtils;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +30,9 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-    final AuthService authService;
+    private final AuthService authService;
+
+    private final AuthUtils authUtils;
 
     @PostMapping("/signin")
     @Operation(summary = "User sign in", tags = "Auth")
@@ -86,14 +85,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "When server error")
     })
     public ResponseEntity<MessageResponse> logout() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-
-        if (authentication instanceof AnonymousAuthenticationToken || principal == null) {
-            throw new BadRequestException("You are not logged in.");
-        }
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
 
         authService.logout(userDetails.getEmail());
 

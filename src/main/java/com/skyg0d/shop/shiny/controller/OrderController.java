@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.controller;
 
+import com.skyg0d.shop.shiny.annotations.IsAdmin;
 import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
@@ -37,12 +38,35 @@ public class OrderController {
         return new ResponseEntity<>(orderService.create(request), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/update/{id}/status/{status}")
-    public ResponseEntity<MessageResponse> updateStatus(@PathVariable String id, @PathVariable EOrderStatus status) {
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<MessageResponse> cancelOrder(@PathVariable String id) {
+        orderService.cancelOrder(id);
 
-        orderService.updateStatus(id, status);
+        return ResponseEntity.ok(new MessageResponse("Order canceled"));
+    }
 
-        return ResponseEntity.ok(new MessageResponse("Order status updated"));
+    @PatchMapping("/{id}/ship")
+    @IsAdmin
+    public ResponseEntity<MessageResponse> shipOrder(@PathVariable String id) {
+        orderService.adminChangeStatus(id, EOrderStatus.SHIPPED, "Order canceled, could not ship.");
+
+        return ResponseEntity.ok(new MessageResponse("Order shipped"));
+    }
+
+    @PatchMapping("/{id}/otw")
+    @IsAdmin
+    public ResponseEntity<MessageResponse> onTheWayOrder(@PathVariable String id) {
+        orderService.adminChangeStatus(id, EOrderStatus.ON_THE_WAY, "Order canceled, could not ship.");
+
+        return ResponseEntity.ok(new MessageResponse("Order on the way"));
+    }
+
+    @PatchMapping("/{id}/deliver")
+    @IsAdmin
+    public ResponseEntity<MessageResponse> deliverOrder(@PathVariable String id) {
+        orderService.adminChangeStatus(id, EOrderStatus.DELIVERED, "Order canceled, could not deliver.");
+
+        return ResponseEntity.ok(new MessageResponse("Order delivered"));
     }
 
 }
