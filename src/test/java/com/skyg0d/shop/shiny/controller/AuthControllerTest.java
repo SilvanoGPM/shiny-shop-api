@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.controller;
 
-import com.skyg0d.shop.shiny.exception.BadRequestException;
 import com.skyg0d.shop.shiny.payload.UserMachineDetails;
 import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
@@ -9,7 +8,9 @@ import com.skyg0d.shop.shiny.payload.response.JwtResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
+import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.AuthService;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.skyg0d.shop.shiny.util.MockUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,11 +25,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.auth.AuthCreator.*;
 import static com.skyg0d.shop.shiny.util.user.UserCreator.createUserResponse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(SpringExtension.class)
 @DisplayName("Tests for AuthController")
@@ -39,6 +40,9 @@ public class AuthControllerTest {
 
     @Mock
     AuthService authService;
+
+    @Mock
+    AuthUtils authUtils;
 
     @BeforeEach
     void setUp() {
@@ -58,6 +62,10 @@ public class AuthControllerTest {
                 .doNothing()
                 .when(authService)
                 .logout(ArgumentMatchers.anyString());
+
+        BDDMockito
+                .when(authUtils.getUserDetails())
+                .thenReturn(new UserDetailsImpl(UUID.randomUUID(), USERNAME, EMAIL, PASSWORD, null));
     }
 
     @Test
@@ -134,15 +142,6 @@ public class AuthControllerTest {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
-    }
-
-    @Test
-    @DisplayName("logout Throws BadRequestException When User Not Logged")
-    void logout_ThrowsBadRequestException_WhenUserNotLogged() {
-        MockUtils.mockSecurityContextHolder(true);
-
-        assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> authController.logout());
     }
 
 }
