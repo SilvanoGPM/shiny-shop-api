@@ -4,6 +4,7 @@ import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
@@ -61,6 +62,10 @@ public class OrderServiceTest {
                 .thenReturn(ordersPage);
 
         BDDMockito
+                .when(orderRepository.findAllByUser(ArgumentMatchers.any(Pageable.class), ArgumentMatchers.any(User.class)))
+                .thenReturn(ordersPage);
+
+        BDDMockito
                 .when(orderRepository.findById(ArgumentMatchers.any(UUID.class)))
                 .thenReturn(Optional.of(createOrder()));
 
@@ -92,6 +97,22 @@ public class OrderServiceTest {
         OrderResponse expectedOrder = createOrderResponse();
 
         Page<OrderResponse> ordersPage = orderService.listAll(PageRequest.of(0, 1));
+
+        assertThat(ordersPage).isNotEmpty();
+
+        assertThat(ordersPage.getContent()).isNotEmpty();
+
+        assertThat(ordersPage.getContent().get(0)).isNotNull();
+
+        assertThat(ordersPage.getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
+    }
+
+    @Test
+    @DisplayName("listAllByUser Returns List Of Orders Inside Page Object When Successful")
+    void listAllByUser_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        OrderResponse expectedOrder = createOrderResponse();
+
+        Page<OrderResponse> ordersPage = orderService.listAllByUser(PageRequest.of(0, 1), "some-email");
 
         assertThat(ordersPage).isNotEmpty();
 

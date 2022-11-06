@@ -43,6 +43,10 @@ public class OrderService {
         return orderRepository.findAll(pageable).map(mapper::toOrderResponse);
     }
 
+    public Page<OrderResponse> listAllByUser(Pageable pageable, String email) {
+        return orderRepository.findAllByUser(pageable, userService.findByEmail(email)).map(mapper::toOrderResponse);
+    }
+
     public Order findById(String id) throws ResourceNotFoundException {
         return orderRepository
                 .findById(UUID.fromString(id))
