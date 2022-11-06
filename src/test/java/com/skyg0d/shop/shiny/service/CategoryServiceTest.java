@@ -63,7 +63,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("listAll Returns List Of Categories Inside Page Object When Successful")
-    void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+    void listAll_() {
         CategoryResponse expectedCategory = createCategoryResponse();
 
         Page<CategoryResponse> categoriesPage = categoryService.listAll(PageRequest.of(0, 1));
