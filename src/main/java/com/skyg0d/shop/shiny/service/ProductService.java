@@ -10,13 +10,14 @@ import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
+import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
+import com.skyg0d.shop.shiny.repository.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,6 +53,10 @@ public class ProductService {
         if (productRepository.existsBySlug(slug)) {
             throw new SlugAlreadyExistsException("Product", slug);
         }
+    }
+
+    public Page<Product> search(ProductParametersSearch search, Pageable pageable) {
+        return productRepository.findAll(ProductSpecification.getSpecification(search), pageable);
     }
 
     public UserProductResponse create(CreateProductRequest request) {
