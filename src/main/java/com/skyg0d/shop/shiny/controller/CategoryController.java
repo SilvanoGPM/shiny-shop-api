@@ -6,13 +6,14 @@ import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
+import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 import com.skyg0d.shop.shiny.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -46,6 +47,11 @@ public class CategoryController {
         }
 
         return ResponseEntity.ok(new MessageResponse(message));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<CategoryResponse>> search(@ParameterObject CategoryParameterSearch search, @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(categoryService.search(search, pageable));
     }
 
     @PostMapping

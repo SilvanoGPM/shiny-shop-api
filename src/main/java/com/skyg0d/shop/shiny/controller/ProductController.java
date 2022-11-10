@@ -3,7 +3,6 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.annotations.IsAdmin;
 import com.skyg0d.shop.shiny.annotations.IsStaff;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
-import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
 import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -62,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Product>> search(@ParameterObject ProductParametersSearch search, @ParameterObject Pageable pageable) {
+    public ResponseEntity<Page<UserProductResponse>> search(@ParameterObject ProductParametersSearch search, @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(productService.search(search, pageable));
     }
 

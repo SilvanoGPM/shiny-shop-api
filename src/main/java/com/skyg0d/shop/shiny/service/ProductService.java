@@ -55,8 +55,10 @@ public class ProductService {
         }
     }
 
-    public Page<Product> search(ProductParametersSearch search, Pageable pageable) {
-        return productRepository.findAll(ProductSpecification.getSpecification(search), pageable);
+    public Page<UserProductResponse> search(ProductParametersSearch search, Pageable pageable) {
+        return productRepository
+                .findAll(ProductSpecification.getSpecification(search), pageable)
+                .map(mapper::toUserProductResponse);
     }
 
     public UserProductResponse create(CreateProductRequest request) {

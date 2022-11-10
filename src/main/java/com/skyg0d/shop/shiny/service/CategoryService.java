@@ -7,7 +7,9 @@ import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
+import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
+import com.skyg0d.shop.shiny.repository.specification.CategorySpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,12 @@ public class CategoryService {
 
     public CategoryResponse findBySlugMapped(String slug) throws ResourceNotFoundException {
         return mapper.toCategoryResponse(findBySlug(slug));
+    }
+
+    public Page<CategoryResponse> search(CategoryParameterSearch search, Pageable pageable) {
+        return categoryRepository
+                .findAll(CategorySpecification.getSpecification(search), pageable)
+                .map(mapper::toCategoryResponse);
     }
 
     public void verifySlugExists(String slug) throws SlugAlreadyExistsException {
