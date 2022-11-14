@@ -35,7 +35,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "Successful"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<CategoryResponse>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<CategoryResponse>> listAll(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(categoryService.listAll(pageable));
     }
 

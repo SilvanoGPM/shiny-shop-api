@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<UserResponse>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<UserResponse>> listAll(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(userService.listAll(pageable));
     }
 
@@ -72,7 +73,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<RefreshToken>> listAllTokens(Pageable pageable) {
+    public ResponseEntity<Page<RefreshToken>> listAllTokens(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(refreshTokenService.listAll(pageable));
     }
 
@@ -84,7 +85,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<UserTokenResponse>> listMyAllTokens(Pageable pageable) {
+    public ResponseEntity<Page<UserTokenResponse>> listMyAllTokens(@ParameterObject Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
                 .getContext()
                 .getAuthentication()

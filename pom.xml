@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <springdoc.version>1.6.11</springdoc.version>
+        <springdoc.version>1.6.12</springdoc.version>
         <jjwt.version>0.9.1</jjwt.version>
         <UserAgentUtils.version>1.21</UserAgentUtils.version>
         <httpclient.version>4.5.13</httpclient.version>
