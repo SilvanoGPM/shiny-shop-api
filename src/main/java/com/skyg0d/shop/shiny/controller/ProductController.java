@@ -12,6 +12,9 @@ import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -31,22 +34,45 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
+    @Operation(summary = "Returns all active products with pagination", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<Page<UserProductResponse>> listAllActive(Pageable pageable) {
         return ResponseEntity.ok(productService.listAllActive(pageable));
     }
 
     @GetMapping("/all")
     @IsStaff
+    @Operation(summary = "Returns all products with pagination", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<Page<AdminProductResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(productService.listAll(pageable));
     }
 
     @GetMapping("/{slug}")
+    @Operation(summary = "Returns product by slug", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "400", description = "When category not found"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<UserProductResponse> findBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(productService.findBySlugMapped(slug));
     }
 
     @GetMapping("/{slug}/exists")
+    @Operation(summary = "Verify if product exists by slug", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> existsBySlug(@PathVariable String slug) {
         String message = "Product don't exists";
 
@@ -60,18 +86,37 @@ public class ProductController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Returns products searched with pagination", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<Page<UserProductResponse>> search(@ParameterObject ProductParametersSearch search, @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(productService.search(search, pageable));
     }
 
     @PostMapping
     @IsAdmin
+    @Operation(summary = "Persists a new product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
         return new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
     }
 
     @PutMapping
     @IsStaff
+    @Operation(summary = "Updates product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceProductRequest request) {
         productService.replace(request);
 
@@ -80,6 +125,13 @@ public class ProductController {
 
     @PatchMapping("/{slug}/toggle/active")
     @IsStaff
+    @Operation(summary = "Toggle product active", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> toggleActive(@PathVariable String slug) {
         productService.toggleActive(slug);
 
@@ -88,6 +140,13 @@ public class ProductController {
 
     @PatchMapping("/{slug}/apply/discount")
     @IsStaff
+    @Operation(summary = "Apply discount to product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) {
         productService.applyDiscount(slug, request.getDiscount());
 
@@ -96,6 +155,13 @@ public class ProductController {
 
     @PatchMapping("/{slug}/change/amount")
     @IsStaff
+    @Operation(summary = "Change product amount", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> changeAmount(@PathVariable String slug, @Valid @RequestBody ChangeAmountRequest request) {
         productService.changeAmount(slug, request.getAmount());
 
@@ -104,6 +170,13 @@ public class ProductController {
 
     @PatchMapping("/{productSlug}/add/{categorySlug}/category")
     @IsStaff
+    @Operation(summary = "Add category to product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
         productService.addCategory(productSlug, categorySlug);
 
@@ -112,6 +185,13 @@ public class ProductController {
 
     @PatchMapping("/{productSlug}/remove/{categorySlug}/category")
     @IsStaff
+    @Operation(summary = "Removes category of product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
         productService.removeCategory(productSlug, categorySlug);
 
@@ -120,6 +200,13 @@ public class ProductController {
 
     @DeleteMapping("/{slug}")
     @IsAdmin
+    @Operation(summary = "Removes product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
     public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
         productService.delete(slug);
 

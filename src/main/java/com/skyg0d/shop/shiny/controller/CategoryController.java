@@ -80,7 +80,7 @@ public class CategoryController {
 
     @PostMapping
     @IsAdmin
-    @Operation(summary = "Persists a new category", tags = "Users")
+    @Operation(summary = "Persists a new category", tags = "Categories")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
@@ -93,7 +93,7 @@ public class CategoryController {
 
     @PutMapping
     @IsAdmin
-    @Operation(summary = "Updates category", tags = "Users")
+    @Operation(summary = "Updates category", tags = "Categories")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
@@ -108,7 +108,7 @@ public class CategoryController {
 
     @DeleteMapping("/{slug}")
     @IsAdmin
-    @Operation(summary = "Removes category", tags = "Users")
+    @Operation(summary = "Removes category", tags = "Categories")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
