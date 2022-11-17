@@ -9,6 +9,7 @@ import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
+import com.skyg0d.shop.shiny.payload.search.UserParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.AuthService;
 import com.skyg0d.shop.shiny.service.RefreshTokenService;
@@ -62,6 +63,19 @@ public class UserController {
     })
     public ResponseEntity<UserResponse> findByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userService.findByEmailMapped(email));
+    }
+
+    @GetMapping("/search")
+    @IsStaff
+    @Operation(summary = "Returns all searched users with pagination", tags = "Users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<Page<UserResponse>> search(@ParameterObject UserParameterSearch search, @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(userService.search(search, pageable));
     }
 
     @GetMapping("/tokens")

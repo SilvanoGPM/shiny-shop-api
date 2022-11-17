@@ -6,7 +6,9 @@ import com.skyg0d.shop.shiny.model.Role;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
+import com.skyg0d.shop.shiny.payload.search.UserParameterSearch;
 import com.skyg0d.shop.shiny.repository.UserRepository;
+import com.skyg0d.shop.shiny.repository.specification.UserSpecification;
 import com.skyg0d.shop.shiny.util.RoleUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,12 @@ public class UserService {
 
     public UserResponse findByEmailMapped(String email) throws ResourceNotFoundException {
         return mapper.toUserResponse(findByEmail(email));
+    }
+
+    public Page<UserResponse> search(UserParameterSearch search, Pageable pageable) {
+        return userRepository
+                .findAll(UserSpecification.getSpecification(search), pageable)
+                .map(mapper::toUserResponse);
     }
 
     public void replace(ReplaceUserRequest request) {

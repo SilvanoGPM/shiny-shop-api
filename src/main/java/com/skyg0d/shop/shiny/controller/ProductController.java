@@ -39,7 +39,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Successful"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<UserProductResponse>> listAllActive(Pageable pageable) {
+    public ResponseEntity<Page<UserProductResponse>> listAllActive(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(productService.listAllActive(pageable));
     }
 
@@ -52,7 +52,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<AdminProductResponse>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<AdminProductResponse>> listAll(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(productService.listAll(pageable));
     }
 

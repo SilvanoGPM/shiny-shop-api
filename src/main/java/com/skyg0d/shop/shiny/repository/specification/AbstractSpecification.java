@@ -150,6 +150,16 @@ public abstract class AbstractSpecification {
         ));
     }
 
+    protected static <T> Specification<T> likeJoin(String join, String string, String property) {
+        string = string == null ? "" : string;
+
+        String liked = "%" + string.toLowerCase() + "%";
+
+        return getSpec(string, (root, query, builder) -> (
+                builder.like(builder.lower(root.join(join).get(property)), liked)
+        ));
+    }
+
     protected static <T, E> Specification<E> getSpec(T value, Specification<E> spec) {
         if (value == null) {
             return null;
