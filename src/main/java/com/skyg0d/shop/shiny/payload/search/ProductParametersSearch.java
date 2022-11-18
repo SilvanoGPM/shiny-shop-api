@@ -1,23 +1,21 @@
 package com.skyg0d.shop.shiny.payload.search;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Getter
 @Setter
-public class ProductParametersSearch {
+public class ProductParametersSearch extends AbstractParameterSearch {
 
     private String name;
     private String description;
     private String thumbnail;
     private String brand;
-
-    private String createdInDateOrAfter;
-    private String createdInDateOrBefore;
 
     private BigDecimal greaterThanOrEqualToPrice = new BigDecimal(-1);
     private BigDecimal lessThanOrEqualToPrice = new BigDecimal(-1);

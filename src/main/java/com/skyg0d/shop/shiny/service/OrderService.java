@@ -10,7 +10,9 @@ import com.skyg0d.shop.shiny.payload.ProductCalculate;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
+import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
+import com.skyg0d.shop.shiny.repository.specification.OrderSpecification;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,10 @@ public class OrderService {
 
     public OrderResponse findByIdMapped(String id) throws ResourceNotFoundException {
         return mapper.toOrderResponse(findById(id));
+    }
+
+    public Page<OrderResponse> search(OrderParameterSearch search, Pageable pageable) {
+        return orderRepository.findAll(OrderSpecification.getSpecification(search), pageable).map(mapper::toOrderResponse);
     }
 
     public OrderResponse create(CreateOrderRequest request) {

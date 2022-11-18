@@ -5,12 +5,15 @@ import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
+import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.OrderService;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,7 @@ import javax.validation.Valid;
 public class OrderController {
 
     private final OrderService orderService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     @IsAdmin
@@ -37,7 +41,7 @@ public class OrderController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<OrderResponse>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<OrderResponse>> listAll(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(orderService.listAll(pageable));
     }
 
@@ -49,7 +53,7 @@ public class OrderController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Page<OrderResponse>> listAllByUser(Pageable pageable) {
+    public ResponseEntity<Page<OrderResponse>> listAllByUser(@ParameterObject Pageable pageable) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -67,6 +71,34 @@ public class OrderController {
     })
     public ResponseEntity<OrderResponse> findById(@PathVariable String id) {
         return ResponseEntity.ok(orderService.findByIdMapped(id));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Returns all searched orders with pagination", tags = "Orders")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<Page<OrderResponse>> search(@ParameterObject OrderParameterSearch search, @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(orderService.search(search, pageable));
+    }
+
+    @GetMapping("/my/search")
+    @Operation(summary = "Returns all searched orders of an user with pagination", tags = "Orders")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<Page<OrderResponse>> mySearch(@ParameterObject OrderParameterSearch search, @ParameterObject Pageable pageable) {
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
+
+        search.setUserEmail(userDetails.getEmail());
+
+        return ResponseEntity.ok(orderService.search(search, pageable));
     }
 
     @PostMapping

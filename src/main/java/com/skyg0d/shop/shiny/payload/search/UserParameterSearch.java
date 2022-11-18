@@ -1,13 +1,14 @@
 package com.skyg0d.shop.shiny.payload.search;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Getter
 @Setter
-public class UserParameterSearch {
+public class UserParameterSearch extends AbstractParameterSearch {
 
     private String username;
     private String fullName;
@@ -23,8 +24,5 @@ public class UserParameterSearch {
     private String street;
     private String number;
     private String referencePoint;
-
-    private String createdInDateOrAfter;
-    private String createdInDateOrBefore;
 
 }
