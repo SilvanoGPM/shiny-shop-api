@@ -22,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -161,13 +160,12 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setUserEmail(jwtCreator.createUser().getEmail());
         request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
 
         ResponseEntity<OrderResponse> entity = httpClient.exchange(
                 "/orders",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                jwtCreator.createUserAuthEntity(request),
                 OrderResponse.class
         );
 
@@ -189,7 +187,6 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setUserEmail(jwtCreator.createUser().getEmail());
         request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
 
         String expectedTitle = "Inactive Product On Order";
@@ -197,7 +194,7 @@ public class OrderControllerIT {
         ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
                 "/orders",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                jwtCreator.createUserAuthEntity(request),
                 ExceptionDetails.class
         );
 
@@ -217,7 +214,6 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setUserEmail(jwtCreator.createUser().getEmail());
         request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
 
         String expectedTitle = "Product Amount Lacking";
@@ -225,7 +221,7 @@ public class OrderControllerIT {
         ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
                 "/orders",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                jwtCreator.createUserAuthEntity(request),
                 ExceptionDetails.class
         );
 

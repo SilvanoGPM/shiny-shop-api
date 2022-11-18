@@ -15,8 +15,6 @@ import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
 
 public class OrderCreator {
 
-    public static final String EMAIL = "test@mail.com";
-
     public static Order createOrder() {
         return Order
                 .builder()
@@ -35,7 +33,6 @@ public class OrderCreator {
         return CreateOrderRequest
                 .builder()
                 .products(List.of(new CreateOrderProduct("test-slug", 10)))
-                .userEmail(EMAIL)
                 .build();
     }
 

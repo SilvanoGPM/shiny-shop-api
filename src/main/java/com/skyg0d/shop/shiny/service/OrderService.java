@@ -63,8 +63,8 @@ public class OrderService {
         return orderRepository.findAll(OrderSpecification.getSpecification(search), pageable).map(mapper::toOrderResponse);
     }
 
-    public OrderResponse create(CreateOrderRequest request) {
-        User user = userService.findByEmail(request.getUserEmail());
+    public OrderResponse create(CreateOrderRequest request, String email) {
+        User user = userService.findByEmail(email);
 
         List<ProductCalculate> products = getProducts(request.getProducts());
 

@@ -174,7 +174,7 @@ public class OrderServiceTest {
     void create_PersistsOrder_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
-        OrderResponse orderFound = orderService.create(createCreateOrderRequest());
+        OrderResponse orderFound = orderService.create(createCreateOrderRequest(), "test@mail.com");
 
         assertThat(orderFound).isNotNull();
 
@@ -200,7 +200,7 @@ public class OrderServiceTest {
 
         OrderResponse expectedOrder = createOrderResponse();
 
-        OrderResponse orderFound = orderService.create(createCreateOrderRequest());
+        OrderResponse orderFound = orderService.create(createCreateOrderRequest(), "test@mail.com");
 
         assertThat(orderFound).isNotNull();
 
@@ -224,7 +224,7 @@ public class OrderServiceTest {
                 .thenReturn(product);
 
         assertThatExceptionOfType(InactiveProductOnOrderException.class)
-                .isThrownBy(() -> orderService.create(createCreateOrderRequest()));
+                .isThrownBy(() -> orderService.create(createCreateOrderRequest(), "test@mail.com"));
     }
 
     @Test
@@ -238,7 +238,7 @@ public class OrderServiceTest {
                 .thenReturn(product);
 
         assertThatExceptionOfType(ProductOverflowAmountException.class)
-                .isThrownBy(() -> orderService.create(createCreateOrderRequest()));
+                .isThrownBy(() -> orderService.create(createCreateOrderRequest(), "test@mail.com"));
     }
 
     @Test

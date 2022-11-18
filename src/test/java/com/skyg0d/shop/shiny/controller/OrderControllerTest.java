@@ -5,7 +5,9 @@ import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
+import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.OrderService;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.skyg0d.shop.shiny.util.MockUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.UUID;
 
+import static com.skyg0d.shop.shiny.util.auth.AuthCreator.*;
 import static com.skyg0d.shop.shiny.util.order.OrderCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +41,9 @@ public class OrderControllerTest {
 
     @Mock
     OrderService orderService;
+
+    @Mock
+    AuthUtils authUtils;
 
     @BeforeEach
     void setUp() {
@@ -56,8 +62,12 @@ public class OrderControllerTest {
                 .thenReturn(createOrderResponse());
 
         BDDMockito
-                .when(orderService.create(ArgumentMatchers.any(CreateOrderRequest.class)))
+                .when(orderService.create(ArgumentMatchers.any(CreateOrderRequest.class), ArgumentMatchers.anyString()))
                 .thenReturn(createOrderResponse());
+
+        BDDMockito
+                .when(authUtils.getUserDetails())
+                .thenReturn(new UserDetailsImpl(UUID.randomUUID(), USERNAME, EMAIL, PASSWORD, null));
 
         BDDMockito
                 .doNothing()

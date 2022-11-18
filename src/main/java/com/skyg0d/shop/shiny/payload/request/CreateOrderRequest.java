@@ -17,7 +17,4 @@ public class CreateOrderRequest {
     @NotNull
     private List<CreateOrderProduct> products = new ArrayList<>();
 
-    @NotEmpty
-    private String userEmail;
-
 }

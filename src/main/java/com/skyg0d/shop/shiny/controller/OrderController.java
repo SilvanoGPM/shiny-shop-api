@@ -105,10 +105,11 @@ public class OrderController {
     @Operation(summary = "Persists a new order", tags = "Orders")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
     public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest request) {
-        return new ResponseEntity<>(orderService.create(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(orderService.create(request, authUtils.getUserDetails().getEmail()), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/cancel")
