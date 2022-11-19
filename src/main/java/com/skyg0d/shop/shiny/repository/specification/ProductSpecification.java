@@ -2,9 +2,12 @@ package com.skyg0d.shop.shiny.repository.specification;
 
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
+import com.skyg0d.shop.shiny.util.CollectionUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.Predicate;
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -22,6 +25,10 @@ public class ProductSpecification extends AbstractSpecification {
                 .and(where(withGreaterThanOrEqualToDiscount(search.getGreaterThenOrEqualToDiscount())))
                 .and(where(withLessThanOrEqualToDiscount(search.getLessThenOrEqualToDiscount())))
                 .and(where(withActive(search.getActive())))
+                .and(where(withCategoryName(search.getCategoryName())))
+                .and(where(withCategoryDescription(search.getCategoryDescription())))
+                .and(where(withFeatures(search.getFeatures())))
+                .and(where(withSizes(search.getSizes())))
                 .and(where(withCreatedInDateOrAfter(search.getCreatedInDateOrAfter())))
                 .and(where(withCreatedInDateOrBefore(search.getCreatedInDateOrBefore())));
     }
@@ -68,6 +75,47 @@ public class ProductSpecification extends AbstractSpecification {
 
     private static Specification<Product> withActive(int active) {
         return withBoolean(active, "active");
+    }
+
+    private static Specification<Product> withCategoryName(String name) {
+        return likeCategory(name, "name");
+    }
+
+    private static Specification<Product> withCategoryDescription(String description) {
+        return likeCategory(description, "description");
+    }
+
+    private static Specification<Product> withSizes(String sizes) {
+        return likeOneOf("sizes", CollectionUtils.parseList(sizes));
+    }
+
+    private static Specification<Product> withFeatures(String features) {
+        return likeOneOf("features", CollectionUtils.parseList(features));
+    }
+
+    private static Specification<Product> likeCategory(String string, String property) {
+        return likeJoin("categories", string, property);
+    }
+
+    private static Specification<Product> likeOneOf(String property, List<String> list) {
+        return getSpec(list, (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate spec = null;
+
+            for (String value : list) {
+                String liked = "%" + value.toLowerCase() + "%";
+
+                if (spec == null) {
+                    spec = builder.or(builder.like(builder.lower(root.join(property)), liked));
+                } else {
+                    spec = builder.or(builder.like(builder.lower(root.join(property)), liked), spec);
+                }
+
+            }
+
+            return spec;
+        });
     }
 
 }

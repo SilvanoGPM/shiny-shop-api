@@ -28,4 +28,10 @@ public class ProductParametersSearch extends AbstractParameterSearch {
 
     private int active = -1;
 
+    private String categoryName;
+    private String categoryDescription;
+
+    private String sizes;
+    private String features;
+
 }
