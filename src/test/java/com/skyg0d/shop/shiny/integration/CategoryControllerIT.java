@@ -106,6 +106,32 @@ public class CategoryControllerIT {
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
+    @Test
+    @DisplayName("search Returns List Of Categories Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        CategoryResponse expectedCategory = createCategoryResponse();
+
+        categoryRepository.save(createCategory());
+
+        ResponseEntity<PageableResponse<CategoryResponse>> entity = httpClient.exchange(
+                String.format("/categories/search?name=%s", expectedCategory.getName()),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getSlug()).isEqualTo(expectedCategory.getSlug());
+    }
 
     @Test
     @DisplayName("existsBySlug Says Category Don't Exists When Successful")
@@ -143,7 +169,7 @@ public class CategoryControllerIT {
                 MessageResponse.class,
                 categorySaved.getSlug()
         );
-        
+
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);

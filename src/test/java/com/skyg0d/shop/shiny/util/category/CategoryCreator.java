@@ -5,6 +5,7 @@ import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
+import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 
 public class CategoryCreator {
 
@@ -57,6 +58,13 @@ public class CategoryCreator {
                 .name(NAME)
                 .description(DESCRIPTION)
                 .thumbnail(THUMBNAIL)
+                .build();
+    }
+
+    public static CategoryParameterSearch createCategortyParameterSearch() {
+        return CategoryParameterSearch
+                .builder()
+                .name(NAME)
                 .build();
     }
 

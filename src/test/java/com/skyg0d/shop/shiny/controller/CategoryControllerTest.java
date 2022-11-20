@@ -6,6 +6,7 @@ import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
+import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 import com.skyg0d.shop.shiny.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,6 +50,10 @@ public class CategoryControllerTest {
         BDDMockito
                 .when(categoryService.findBySlugMapped(ArgumentMatchers.anyString()))
                 .thenReturn(createCategoryResponse());
+
+        BDDMockito
+                .when(categoryService.search(ArgumentMatchers.any(CategoryParameterSearch.class), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(categoryPage);
 
         BDDMockito
                 .when(categoryService.create(ArgumentMatchers.any(CreateCategoryRequest.class)))
@@ -99,6 +104,26 @@ public class CategoryControllerTest {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getSlug()).isEqualTo(expectedCategory.getSlug());
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Categories Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        CategoryResponse expectedCategory = createCategoryResponse();
+
+        ResponseEntity<Page<CategoryResponse>> entity = categoryController.search(createCategortyParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getSlug()).isEqualTo(expectedCategory.getSlug());
     }
 
     @Test

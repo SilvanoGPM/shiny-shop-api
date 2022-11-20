@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -52,6 +53,10 @@ public class CategoryServiceTest {
                 .thenReturn(false);
 
         BDDMockito
+                .when(categoryRepository.findAll(ArgumentMatchers.<Specification<Category>>any(), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(categoryPage);
+
+        BDDMockito
                 .when(categoryRepository.save(ArgumentMatchers.any(Category.class)))
                 .thenReturn(createCategory());
 
@@ -63,7 +68,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("listAll Returns List Of Categories Inside Page Object When Successful")
-    void listAll_() {
+    void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         CategoryResponse expectedCategory = createCategoryResponse();
 
         Page<CategoryResponse> categoriesPage = categoryService.listAll(PageRequest.of(0, 1));
@@ -121,6 +126,22 @@ public class CategoryServiceTest {
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> categoryService.findBySlug("test-slug"));
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Categories Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        CategoryResponse expectedCategory = createCategoryResponse();
+
+        Page<CategoryResponse> categoriesPage = categoryService.search(createCategortyParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(categoriesPage).isNotEmpty();
+
+        assertThat(categoriesPage.getContent()).isNotEmpty();
+
+        assertThat(categoriesPage.getContent().get(0)).isNotNull();
+
+        assertThat(categoriesPage.getContent().get(0).getSlug()).isEqualTo(expectedCategory.getSlug());
     }
 
     @Test
