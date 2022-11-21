@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
@@ -58,6 +59,10 @@ public class ProductServiceTest {
         BDDMockito
                 .when(productRepository.findBySlug(ArgumentMatchers.anyString()))
                 .thenReturn(Optional.of(createProduct()));
+
+        BDDMockito
+                .when(productRepository.findAll(ArgumentMatchers.<Specification<Product>>any(), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(productsPage);
 
         BDDMockito
                 .when(productRepository.existsBySlug(ArgumentMatchers.anyString()))
@@ -153,6 +158,22 @@ public class ProductServiceTest {
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> productService.findBySlugMapped("test-slug"));
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Products Inside Page Object When Successful")
+    void search_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
+        UserProductResponse expectedProduct = createUserProductResponse();
+
+        Page<UserProductResponse> productsPage = productService.search(createProductParametersSearch(), PageRequest.of(0, 1));
+
+        assertThat(productsPage).isNotEmpty();
+
+        assertThat(productsPage.getContent()).isNotEmpty();
+
+        assertThat(productsPage.getContent().get(0)).isNotNull();
+
+        assertThat(productsPage.getContent().get(0).getSlug()).isEqualTo(expectedProduct.getSlug());
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
+import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +58,10 @@ public class ProductControllerTest {
         BDDMockito
                 .when(productService.findBySlugMapped(ArgumentMatchers.anyString()))
                 .thenReturn(createUserProductResponse());
+
+        BDDMockito
+                .when(productService.search(ArgumentMatchers.any(ProductParametersSearch.class), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(userProductsPage);
 
         BDDMockito
                 .when(productService.create(ArgumentMatchers.any(CreateProductRequest.class)))
@@ -152,6 +157,26 @@ public class ProductControllerTest {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getSlug()).isEqualTo(expectedProduct.getSlug());
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Products Inside Page Object When Successful")
+    void search_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
+        UserProductResponse expectedProduct = createUserProductResponse();
+
+        ResponseEntity<Page<UserProductResponse>> entity = productController.search(createProductParametersSearch(), PageRequest.of(0, 1));
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getSlug()).isEqualTo(expectedProduct.getSlug());
     }
 
     @Test

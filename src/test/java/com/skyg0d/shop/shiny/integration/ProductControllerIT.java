@@ -151,6 +151,33 @@ public class ProductControllerIT {
     }
 
     @Test
+    @DisplayName("search Returns List Of Products Inside Page Object When Successful")
+    void search_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
+        UserProductResponse expectedProduct = createUserProductResponse();
+
+        productRepository.save(createProductToBeSave());
+
+        ResponseEntity<PageableResponse<UserProductResponse>> entity = httpClient.exchange(
+                String.format("/products/search?name=%s", expectedProduct.getName()),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getSlug()).isEqualTo(expectedProduct.getSlug());
+    }
+
+    @Test
     @DisplayName("existsBySlug Says Product Don't Exists When Successful")
     void existsBySlug_SaysProductDoNotExists_WhenSuccessful() {
         String expectedMessage = "Product don't exists";

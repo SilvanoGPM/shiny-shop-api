@@ -7,6 +7,7 @@ import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
+import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -99,6 +100,15 @@ public class ProductCreator {
                 .sizes(new HashSet<>(SIZES))
                 .features(new HashSet<>(FEATURES))
                 .categories(new HashSet<>())
+                .build();
+    }
+
+    public static ProductParametersSearch createProductParametersSearch() {
+        return ProductParametersSearch
+                .builder()
+                .name(NAME)
+                .lessThanOrEqualToPrice(new BigDecimal(-1))
+                .greaterThanOrEqualToPrice(new BigDecimal(-1))
                 .build();
     }
 
