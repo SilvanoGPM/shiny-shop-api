@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.integration;
 
+import com.skyg0d.shop.shiny.mapper.UserMapper;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
@@ -50,6 +51,8 @@ public class UserControllerIT {
     @Test
     @DisplayName("listAll Returns List Of Users Inside Page Object When Successful")
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
+        UserResponse expectedUser = UserMapper.INSTANCE.toUserResponse(findUserByEmail(jwtCreator.createUser().getEmail()));
+
         ResponseEntity<PageableResponse<UserResponse>> entity = httpClient.exchange(
                 "/users",
                 HttpMethod.GET,
@@ -62,6 +65,10 @@ public class UserControllerIT {
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotNull();
+
+        assertThat(entity.getBody().getContent()).contains(expectedUser);
     }
 
     @Test
@@ -140,6 +147,29 @@ public class UserControllerIT {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Users Inside Page Object When Successful")
+    void search_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
+        UserResponse expectedUser = UserMapper.INSTANCE.toUserResponse(findUserByEmail(jwtCreator.createUser().getEmail()));
+
+        ResponseEntity<PageableResponse<UserResponse>> entity = httpClient.exchange(
+                "/users/search",
+                HttpMethod.GET,
+                jwtCreator.createAdminAuthEntity(null),
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotNull();
+
+        assertThat(entity.getBody().getContent()).contains(expectedUser);
     }
 
     @Test

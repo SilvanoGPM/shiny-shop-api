@@ -5,6 +5,7 @@ import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
+import com.skyg0d.shop.shiny.payload.search.UserParameterSearch;
 import com.skyg0d.shop.shiny.service.AuthService;
 import com.skyg0d.shop.shiny.service.RefreshTokenService;
 import com.skyg0d.shop.shiny.service.UserService;
@@ -77,6 +78,10 @@ public class UserControllerTest {
         BDDMockito
                 .when(userService.findByEmailMapped(ArgumentMatchers.anyString()))
                 .thenReturn(createUserResponse());
+
+        BDDMockito
+                .when(userService.search(ArgumentMatchers.any(UserParameterSearch.class), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(usersPage);
 
         BDDMockito
                 .doNothing()
@@ -165,6 +170,26 @@ public class UserControllerTest {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Users Inside Page Object When Successful")
+    void search_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
+        UserResponse expectedUser = createUserResponse();
+
+        ResponseEntity<Page<UserResponse>> entity = userController.search(createUserParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test

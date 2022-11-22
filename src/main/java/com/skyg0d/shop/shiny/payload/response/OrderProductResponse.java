@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 @Setter
+@EqualsAndHashCode
 public class OrderProductResponse {
 
     private String slug;

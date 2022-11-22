@@ -18,7 +18,11 @@ public class RoleUtils {
     }
 
     public static ERole getRoleByStringOrNull(String name) {
-        return roles.getOrDefault(name.toLowerCase(), null);
+        if (name == null) {
+            return null;
+        }
+
+        return roles.get(name.toLowerCase());
     }
 
 }

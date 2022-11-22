@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -12,9 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class UserTokenResponse {
 
     private String id;
+    @JsonProperty("expiry_date")
     private Instant expiryDate;
     @Schema(description = "Token to generate others access tokens")
     private String token;

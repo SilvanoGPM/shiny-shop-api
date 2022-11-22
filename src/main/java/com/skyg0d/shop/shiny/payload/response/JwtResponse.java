@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @Builder
 public class JwtResponse {

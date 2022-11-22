@@ -2,6 +2,7 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.model.ERole;
+import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -24,8 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.skyg0d.shop.shiny.util.role.RoleCreator.createRole;
-import static com.skyg0d.shop.shiny.util.user.UserCreator.createReplaceUserRequest;
-import static com.skyg0d.shop.shiny.util.user.UserCreator.createUser;
+import static com.skyg0d.shop.shiny.util.user.UserCreator.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -58,6 +59,10 @@ public class UserServiceTest {
         BDDMockito
                 .when(roleService.findByName(ArgumentMatchers.any(ERole.class)))
                 .thenReturn(createRole());
+
+        BDDMockito
+                .when(userRepository.findAll(ArgumentMatchers.<Specification<User>>any(), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(usersPage);
     }
 
     @Test
@@ -120,6 +125,22 @@ public class UserServiceTest {
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> userService.findByEmailMapped("some-email"));
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Users Inside Page Object When Successful")
+    void search_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
+        User expectedUser = createUser();
+
+        Page<UserResponse> usersPage = userService.search(createUserParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(usersPage).isNotEmpty();
+
+        assertThat(usersPage.getContent()).isNotEmpty();
+
+        assertThat(usersPage.getContent().get(0)).isNotNull();
+
+        assertThat(usersPage.getContent().get(0).getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test

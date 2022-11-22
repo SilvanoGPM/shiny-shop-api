@@ -7,6 +7,7 @@ import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
+import com.skyg0d.shop.shiny.payload.search.UserParameterSearch;
 
 import java.util.Set;
 import java.util.UUID;
@@ -63,6 +64,13 @@ public class UserCreator {
                 .email(EMAIL)
                 .fullName(FULL_NAME)
                 .username(USERNAME)
+                .build();
+    }
+
+    public static UserParameterSearch createUserParameterSearch() {
+        return UserParameterSearch
+                .builder()
+                .fullName(FULL_NAME)
                 .build();
     }
 
