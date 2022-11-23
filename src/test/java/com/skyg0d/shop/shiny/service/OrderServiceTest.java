@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -76,6 +77,10 @@ public class OrderServiceTest {
         BDDMockito
                 .when(productService.findBySlug(ArgumentMatchers.anyString()))
                 .thenReturn(createProduct());
+
+        BDDMockito
+                .when(orderRepository.findAll(ArgumentMatchers.<Specification<Order>>any(), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(ordersPage);
 
         BDDMockito
                 .doNothing()
@@ -167,6 +172,22 @@ public class OrderServiceTest {
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> orderService.findByIdMapped(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Orders Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        OrderResponse expectedOrder = createOrderResponse();
+
+        Page<OrderResponse> ordersPage = orderService.search(createOrderParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(ordersPage).isNotEmpty();
+
+        assertThat(ordersPage.getContent()).isNotEmpty();
+
+        assertThat(ordersPage.getContent().get(0)).isNotNull();
+
+        assertThat(ordersPage.getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
     }
 
     @Test

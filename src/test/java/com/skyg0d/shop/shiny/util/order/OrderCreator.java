@@ -6,6 +6,7 @@ import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
+import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,6 +34,15 @@ public class OrderCreator {
         return CreateOrderRequest
                 .builder()
                 .products(List.of(new CreateOrderProduct("test-slug", 10)))
+                .build();
+    }
+
+    public static OrderParameterSearch createOrderParameterSearch() {
+        return OrderParameterSearch
+                .builder()
+                .greaterThanOrEqualToPrice(new BigDecimal(-1))
+                .lessThanOrEqualToPrice(new BigDecimal(-1))
+                .status("SHIPPING")
                 .build();
     }
 

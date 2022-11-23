@@ -132,6 +132,56 @@ public class OrderControllerIT {
     }
 
     @Test
+    @DisplayName("search Returns List Of Orders Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        Order expectedOrder = persistOrder();
+
+        ResponseEntity<PageableResponse<OrderResponse>> entity = httpClient.exchange(
+                "/orders/search",
+                HttpMethod.GET,
+                jwtCreator.createAdminAuthEntity(null),
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
+    }
+
+    @Test
+    @DisplayName("mySearch Returns List Of Orders Inside Page Object When Successful")
+    void mySearch_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        Order expectedOrder = persistOrder();
+
+        ResponseEntity<PageableResponse<OrderResponse>> entity = httpClient.exchange(
+                "/orders/my/search",
+                HttpMethod.GET,
+                jwtCreator.createUserAuthEntity(null),
+                new ParameterizedTypeReference<>() {
+                });
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
+    }
+
+    @Test
     @DisplayName("findById Returns ExceptionDetails When Order Don't Exists")
     void findById_ReturnsExceptionDetails_WhenOrderDoNotExists() {
         String expectedTitle = "Resource Not Found";

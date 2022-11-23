@@ -5,6 +5,7 @@ import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
+import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.OrderService;
 import com.skyg0d.shop.shiny.util.AuthUtils;
@@ -60,6 +61,10 @@ public class OrderControllerTest {
         BDDMockito
                 .when(orderService.findByIdMapped(ArgumentMatchers.anyString()))
                 .thenReturn(createOrderResponse());
+
+        BDDMockito
+                .when(orderService.search(ArgumentMatchers.any(OrderParameterSearch.class), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(ordersPage);
 
         BDDMockito
                 .when(orderService.create(ArgumentMatchers.any(CreateOrderRequest.class), ArgumentMatchers.anyString()))
@@ -137,6 +142,46 @@ public class OrderControllerTest {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getId()).isEqualTo(expectedOrder.getId());
+    }
+
+    @Test
+    @DisplayName("search Returns List Of Orders Inside Page Object When Successful")
+    void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        OrderResponse expectedOrder = createOrderResponse();
+
+        ResponseEntity<Page<OrderResponse>> entity = orderController.search(createOrderParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
+    }
+
+    @Test
+    @DisplayName("mySearch Returns List Of Orders Inside Page Object When Successful")
+    void mySearch_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+        OrderResponse expectedOrder = createOrderResponse();
+
+        ResponseEntity<Page<OrderResponse>> entity = orderController.mySearch(createOrderParameterSearch(), PageRequest.of(0, 1));
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(entity.getBody()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent()).isNotEmpty();
+
+        assertThat(entity.getBody().getContent().get(0)).isNotNull();
+
+        assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
     }
 
     @Test
