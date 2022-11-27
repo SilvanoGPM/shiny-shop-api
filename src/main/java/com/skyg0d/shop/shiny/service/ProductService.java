@@ -11,22 +11,19 @@ import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
-import com.skyg0d.shop.shiny.property.StripeProps;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.repository.specification.ProductSpecification;
+import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
-import com.stripe.param.PriceCreateParams;
-import com.stripe.param.PriceUpdateParams;
-import com.stripe.param.ProductCreateParams;
 import com.stripe.param.ProductUpdateParams;
+import com.stripe.param.common.EmptyParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -38,7 +35,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
-    private final StripeProps stripeProps;
+    private final StripeUtils stripeUtils;
 
     private final ProductMapper mapper = ProductMapper.INSTANCE;
 
@@ -78,27 +75,9 @@ public class ProductService {
         Product productMapped = mapper.toProduct(request);
         productMapped.setCategories(getCategories(request.getCategories()));
 
-        ProductCreateParams productParams = ProductCreateParams
-                .builder()
-                .setName(request.getName())
-                .setDescription(request.getDescription())
-                .putMetadata("slug", request.getSlug())
-                .putMetadata("brand", request.getBrand())
-                .addImage(request.getThumbnail())
-                .addAllImage(new ArrayList<>(request.getImages()))
-                .build();
+        com.stripe.model.Product stripeProduct = stripeUtils.createProduct(request);
 
-        com.stripe.model.Product stripeProduct = com.stripe.model.Product
-                .create(productParams);
-
-        PriceCreateParams priceParams = PriceCreateParams
-                .builder()
-                .setProduct(stripeProduct.getId())
-                .setUnitAmountDecimal(productMapped.getPrice())
-                .setCurrency(stripeProps.getCurrency())
-                .build();
-
-        Price stripePrice = Price.create(priceParams);
+        Price stripePrice = stripeUtils.createPrice(stripeProduct.getId(), productMapped.getPrice());
 
         productMapped.setStripeProductId(stripeProduct.getId());
         productMapped.setStripePriceId(stripePrice.getId());
@@ -120,12 +99,15 @@ public class ProductService {
         productMapped.setStripePriceId(productFound.getStripePriceId());
         productMapped.setStripeProductId(productFound.getStripeProductId());
 
+        if (productFound.getPrice().compareTo(request.getPrice()) != 0) {
+            stripeUtils.desactivePrice(productFound.getStripePriceId());
+            stripeUtils.createPrice(productFound.getStripeProductId(), request.getPrice());
+        }
+
         Product productSaved = productRepository.save(productMapped);
 
-        Price stripePrice = Price.retrieve(productSaved.getStripePriceId());
-
         com.stripe.model.Product stripeProduct =
-                com.stripe.model.Product.retrieve(productSaved.getStripeProductId());
+                stripeUtils.retrieveProduct(productSaved.getStripeProductId());
 
         ProductUpdateParams productUpdateParams = ProductUpdateParams
                 .builder()
@@ -137,9 +119,13 @@ public class ProductService {
         stripeProduct.update(productUpdateParams);
     }
 
-    public void toggleActive(String slug) {
+    public void toggleActive(String slug) throws StripeException {
+
         Product productFound = findBySlug(slug);
-        productFound.setActive(!productFound.isActive());
+
+        boolean isActive = !productFound.isActive();
+        productFound.setActive(isActive);
+        stripeUtils.setProductActive(productFound.getStripeProductId(), isActive);
 
         productRepository.save(productFound);
     }
@@ -160,16 +146,18 @@ public class ProductService {
         productRepository.save(productFound);
     }
 
-    public void addCategory(String productSlug, String categorySlug) {
+    public void addCategory(String productSlug, String categorySlug) throws StripeException {
         Product productFound = findBySlug(productSlug);
         Category categoryFound = categoryService.findBySlug(categorySlug);
 
         productFound.getCategories().add(categoryFound);
 
+        stripeUtils.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
+
         productRepository.save(productFound);
     }
 
-    public void removeCategory(String productSlug, String categorySlug) {
+    public void removeCategory(String productSlug, String categorySlug) throws StripeException {
         Product productFound = findBySlug(productSlug);
 
         Predicate<Category> existsCategory = (category) -> category.getSlug().equalsIgnoreCase(categorySlug);
@@ -184,6 +172,8 @@ public class ProductService {
 
         productFound.getCategories().removeIf(existsCategory);
 
+        stripeUtils.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
+
         productRepository.save(productFound);
     }
 
@@ -191,9 +181,15 @@ public class ProductService {
     public void delete(String slug) throws StripeException {
         Product productFound = findBySlug(slug);
 
-        Price.retrieve(productFound.getStripePriceId()).update(PriceUpdateParams.builder().setActive(false).build());
+        try {
+            stripeUtils.desactivePrice(productFound.getStripePriceId());
 
-        com.stripe.model.Product.retrieve(productFound.getStripeProductId()).delete();
+            com.stripe.model.Product stripeProduct = stripeUtils.retrieveProduct(productFound.getStripeProductId());
+            stripeProduct.update(ProductUpdateParams.builder().setDefaultPrice(EmptyParam.EMPTY).build());
+            stripeProduct.delete();
+        } catch (StripeException ex) {
+            stripeUtils.setProductActive(productFound.getStripeProductId(), false);
+        }
 
         productRepository.delete(productFound);
     }

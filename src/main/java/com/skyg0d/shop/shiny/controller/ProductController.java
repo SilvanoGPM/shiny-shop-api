@@ -133,7 +133,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> toggleActive(@PathVariable String slug) {
+    public ResponseEntity<MessageResponse> toggleActive(@PathVariable String slug) throws StripeException {
         productService.toggleActive(slug);
 
         return ResponseEntity.ok(new MessageResponse("Product visibility toggle!"));
@@ -178,7 +178,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
+    public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
         productService.addCategory(productSlug, categorySlug);
 
         return ResponseEntity.ok(new MessageResponse("Add category to product!"));
@@ -193,7 +193,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) {
+    public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
         productService.removeCategory(productSlug, categorySlug);
 
         return ResponseEntity.ok(new MessageResponse("Remove product category!"));
