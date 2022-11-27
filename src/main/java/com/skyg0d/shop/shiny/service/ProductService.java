@@ -11,13 +11,22 @@ import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
+import com.skyg0d.shop.shiny.property.StripeProps;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.repository.specification.ProductSpecification;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Price;
+import com.stripe.param.PriceCreateParams;
+import com.stripe.param.PriceUpdateParams;
+import com.stripe.param.ProductCreateParams;
+import com.stripe.param.ProductUpdateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -28,6 +37,8 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
+
+    private final StripeProps stripeProps;
 
     private final ProductMapper mapper = ProductMapper.INSTANCE;
 
@@ -61,18 +72,44 @@ public class ProductService {
                 .map(mapper::toUserProductResponse);
     }
 
-    public UserProductResponse create(CreateProductRequest request) {
+    public UserProductResponse create(CreateProductRequest request) throws StripeException {
         verifySlugExists(request.getSlug());
 
         Product productMapped = mapper.toProduct(request);
         productMapped.setCategories(getCategories(request.getCategories()));
+
+        ProductCreateParams productParams = ProductCreateParams
+                .builder()
+                .setName(request.getName())
+                .setDescription(request.getDescription())
+                .putMetadata("slug", request.getSlug())
+                .putMetadata("brand", request.getBrand())
+                .addImage(request.getThumbnail())
+                .addAllImage(new ArrayList<>(request.getImages()))
+                .build();
+
+        com.stripe.model.Product stripeProduct = com.stripe.model.Product
+                .create(productParams);
+
+        PriceCreateParams priceParams = PriceCreateParams
+                .builder()
+                .setProduct(stripeProduct.getId())
+                .setUnitAmountDecimal(productMapped.getPrice())
+                .setCurrency(stripeProps.getCurrency())
+                .build();
+
+        Price stripePrice = Price.create(priceParams);
+
+        productMapped.setStripeProductId(stripeProduct.getId());
+        productMapped.setStripePriceId(stripePrice.getId());
 
         Product productSaved = productRepository.save(productMapped);
 
         return mapper.toUserProductResponse(productSaved);
     }
 
-    public void replace(ReplaceProductRequest request) {
+    @Transactional
+    public void replace(ReplaceProductRequest request) throws StripeException {
         Product productFound = findBySlug(request.getSlug());
         Product productMapped = mapper.toProduct(request);
 
@@ -80,8 +117,24 @@ public class ProductService {
 
         productMapped.setId(productFound.getId());
         productMapped.setCategories(categories);
+        productMapped.setStripePriceId(productFound.getStripePriceId());
+        productMapped.setStripeProductId(productFound.getStripeProductId());
 
-        productRepository.save(productMapped);
+        Product productSaved = productRepository.save(productMapped);
+
+        Price stripePrice = Price.retrieve(productSaved.getStripePriceId());
+
+        com.stripe.model.Product stripeProduct =
+                com.stripe.model.Product.retrieve(productSaved.getStripeProductId());
+
+        ProductUpdateParams productUpdateParams = ProductUpdateParams
+                .builder()
+                .setName(productSaved.getName())
+                .setDescription(productSaved.getDescription())
+                .setImages(productSaved.getImages())
+                .build();
+
+        stripeProduct.update(productUpdateParams);
     }
 
     public void toggleActive(String slug) {
@@ -134,8 +187,15 @@ public class ProductService {
         productRepository.save(productFound);
     }
 
-    public void delete(String slug) {
-        productRepository.delete(findBySlug(slug));
+    @Transactional
+    public void delete(String slug) throws StripeException {
+        Product productFound = findBySlug(slug);
+
+        Price.retrieve(productFound.getStripePriceId()).update(PriceUpdateParams.builder().setActive(false).build());
+
+        com.stripe.model.Product.retrieve(productFound.getStripeProductId()).delete();
+
+        productRepository.delete(productFound);
     }
 
     private Set<Category> getCategories(Set<String> categories) {

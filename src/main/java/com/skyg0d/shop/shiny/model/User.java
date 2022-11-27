@@ -55,6 +55,8 @@ public class User extends BaseEntity {
     )
     private Set<Role> roles = new HashSet<>();
 
+    private String customerId;
+
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;

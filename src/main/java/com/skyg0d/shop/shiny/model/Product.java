@@ -39,6 +39,10 @@ public class Product extends BaseEntity {
 
     private String brand;
 
+    private String stripeProductId;
+
+    private String stripePriceId;
+
     @Positive
     private BigDecimal price;
 

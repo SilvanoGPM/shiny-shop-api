@@ -2,7 +2,9 @@ package com.skyg0d.shop.shiny.handler;
 
 import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
+import com.skyg0d.shop.shiny.exception.details.StripeExceptionDetails;
 import com.skyg0d.shop.shiny.exception.details.ValidationExceptionDetails;
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +109,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ExceptionDetails handleAccessDeniedException(AccessDeniedException ex) {
         return ExceptionDetails
                 .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Access Denied");
+    }
+
+    @ExceptionHandler(StripeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionDetails handleStripeException(StripeException ex) {
+        Throwable cause = ex.getCause();
+
+        String title = cause != null
+                ? cause.getMessage()
+                : "Stripe Error";
+
+        return StripeExceptionDetails
+                .builder()
+                .title(title)
+                .stripeRequestId(ex.getRequestId())
+                .stripeCode(ex.getCode())
+                .stripeStatusCode(ex.getStatusCode())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .timestamp(LocalDateTime.now().toString())
+                .build();
     }
 
     @Override

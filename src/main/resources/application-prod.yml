@@ -3,3 +3,7 @@ app:
     secret: ${SECRET_KEY}
     expirationMs: 3600000 # 1 hour
     refreshExpirationMs: 2592000000 # 30 days
+
+  stripe:
+    publicKey: ${STRIPE_PUBLIC_KEY}
+    secretKey: ${STRIPE_SECRET_KEY}

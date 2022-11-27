@@ -12,6 +12,7 @@ import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
+import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -104,7 +105,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
+    public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) throws StripeException {
         return new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
     }
 
@@ -117,7 +118,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceProductRequest request) {
+    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceProductRequest request) throws StripeException {
         productService.replace(request);
 
         return ResponseEntity.ok(new MessageResponse("Product replaced!"));
@@ -207,7 +208,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
+    public ResponseEntity<MessageResponse> delete(@PathVariable String slug) throws StripeException {
         productService.delete(slug);
 
         return ResponseEntity.ok(new MessageResponse("Product removed!"));

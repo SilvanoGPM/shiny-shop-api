@@ -69,6 +69,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void addCustomerId(String email, String customerId) {
+        User user = findByEmail(email);
+
+        user.setCustomerId(customerId);
+
+        userRepository.save(user);
+    }
+
     private Set<Role> getUserRoles(Set<String> roles) {
         Optional<Set<String>> optionalRoles = Optional.ofNullable(roles);
 
