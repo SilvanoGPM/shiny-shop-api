@@ -9,7 +9,6 @@ import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
-import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.skyg0d.shop.shiny.util.category.CategoryCreator;
 import com.stripe.model.Price;
 import com.stripe.param.ProductUpdateParams;
@@ -52,7 +51,7 @@ public class ProductServiceTest {
     CategoryService categoryService;
 
     @Mock
-    StripeUtils stripeUtils;
+    StripeService stripeService;
 
     @BeforeEach
     @SneakyThrows
@@ -82,35 +81,35 @@ public class ProductServiceTest {
                 .thenReturn(false);
 
         BDDMockito
-                .when(stripeUtils.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
+                .when(stripeService.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
                 .thenReturn(stripeProductMock);
 
         BDDMockito
-                .when(stripeUtils.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .when(stripeService.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
                 .thenReturn(new Price());
 
         BDDMockito
                 .doNothing()
-                .when(stripeUtils)
+                .when(stripeService)
                 .desactivePrice(ArgumentMatchers.anyString());
 
         BDDMockito
                 .doNothing()
-                .when(stripeUtils)
+                .when(stripeService)
                 .setProductActive(ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean());
 
         BDDMockito
                 .doNothing()
-                .when(stripeUtils)
+                .when(stripeService)
                 .updateProduct(ArgumentMatchers.anyString(), ArgumentMatchers.any(ProductUpdateParams.class));
 
         BDDMockito
                 .doNothing()
-                .when(stripeUtils)
+                .when(stripeService)
                 .deleteProduct(ArgumentMatchers.anyString());
 
         BDDMockito
-                .when(stripeUtils.retrieveProduct(ArgumentMatchers.anyString()))
+                .when(stripeService.retrieveProduct(ArgumentMatchers.anyString()))
                 .thenReturn(stripeProductMock);
 
         BDDMockito
@@ -324,7 +323,7 @@ public class ProductServiceTest {
 
         BDDMockito
                 .willThrow(new RuntimeException())
-                .given(stripeUtils)
+                .given(stripeService)
                 .desactivePrice(ArgumentMatchers.anyString());
 
         assertThatCode(() -> productService.delete("test-slug"))

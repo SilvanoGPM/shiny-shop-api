@@ -13,7 +13,6 @@ import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.repository.specification.ProductSpecification;
-import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.param.ProductUpdateParams;
@@ -35,7 +34,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
-    private final StripeUtils stripeUtils;
+    private final StripeService stripeService;
 
     private final ProductMapper mapper = ProductMapper.INSTANCE;
 
@@ -75,9 +74,9 @@ public class ProductService {
         Product productMapped = mapper.toProduct(request);
         productMapped.setCategories(getCategories(request.getCategories()));
 
-        com.stripe.model.Product stripeProduct = stripeUtils.createProduct(request);
+        com.stripe.model.Product stripeProduct = stripeService.createProduct(request);
 
-        Price stripePrice = stripeUtils.createPrice(stripeProduct.getId(), productMapped.getPrice());
+        Price stripePrice = stripeService.createPrice(stripeProduct.getId(), productMapped.getPrice());
 
         productMapped.setStripeProductId(stripeProduct.getId());
         productMapped.setStripePriceId(stripePrice.getId());
@@ -100,8 +99,8 @@ public class ProductService {
         productMapped.setStripeProductId(productFound.getStripeProductId());
 
         if (productFound.getPrice().compareTo(request.getPrice()) != 0) {
-            stripeUtils.desactivePrice(productFound.getStripePriceId());
-            stripeUtils.createPrice(productFound.getStripeProductId(), request.getPrice());
+            stripeService.desactivePrice(productFound.getStripePriceId());
+            stripeService.createPrice(productFound.getStripeProductId(), request.getPrice());
         }
 
         Product productSaved = productRepository.save(productMapped);
@@ -113,7 +112,7 @@ public class ProductService {
                 .setImages(productSaved.getImages())
                 .build();
 
-        stripeUtils.updateProduct(productSaved.getStripeProductId(), productUpdateParams);
+        stripeService.updateProduct(productSaved.getStripeProductId(), productUpdateParams);
     }
 
     public void toggleActive(String slug) throws StripeException {
@@ -122,7 +121,7 @@ public class ProductService {
 
         boolean isActive = !productFound.isActive();
         productFound.setActive(isActive);
-        stripeUtils.setProductActive(productFound.getStripeProductId(), isActive);
+        stripeService.setProductActive(productFound.getStripeProductId(), isActive);
 
         productRepository.save(productFound);
     }
@@ -149,7 +148,7 @@ public class ProductService {
 
         productFound.getCategories().add(categoryFound);
 
-        stripeUtils.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
+        stripeService.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
 
         productRepository.save(productFound);
     }
@@ -169,7 +168,7 @@ public class ProductService {
 
         productFound.getCategories().removeIf(existsCategory);
 
-        stripeUtils.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
+        stripeService.updateProductMetadata(productFound.getStripeProductId(), productFound.getCategories());
 
         productRepository.save(productFound);
     }
@@ -179,11 +178,11 @@ public class ProductService {
         Product productFound = findBySlug(slug);
 
         try {
-            stripeUtils.desactivePrice(productFound.getStripePriceId());
-            stripeUtils.updateProduct(productFound.getStripeProductId(), ProductUpdateParams.builder().setDefaultPrice(EmptyParam.EMPTY).build());
-            stripeUtils.deleteProduct(productFound.getStripeProductId());
+            stripeService.desactivePrice(productFound.getStripePriceId());
+            stripeService.updateProduct(productFound.getStripeProductId(), ProductUpdateParams.builder().setDefaultPrice(EmptyParam.EMPTY).build());
+            stripeService.deleteProduct(productFound.getStripeProductId());
         } catch (Exception ex) {
-            stripeUtils.setProductActive(productFound.getStripeProductId(), false);
+            stripeService.setProductActive(productFound.getStripeProductId(), false);
         }
 
         productRepository.delete(productFound);

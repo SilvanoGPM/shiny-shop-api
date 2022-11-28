@@ -12,8 +12,8 @@ import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
+import com.skyg0d.shop.shiny.service.StripeService;
 import com.skyg0d.shop.shiny.util.JWTCreator;
-import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.skyg0d.shop.shiny.wrapper.PageableResponse;
 import com.stripe.model.Price;
 import lombok.SneakyThrows;
@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProductControllerIT {
 
     @MockBean
-    StripeUtils stripeUtils;
+    StripeService stripeService;
 
     @Autowired
     TestRestTemplate httpClient;
@@ -71,11 +71,11 @@ public class ProductControllerIT {
         stripePrice.setId(STRIPE_PRICE_ID);
 
         BDDMockito
-                .when(stripeUtils.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
+                .when(stripeService.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
                 .thenReturn(stripeProduct);
 
         BDDMockito
-                .when(stripeUtils.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .when(stripeService.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
                 .thenReturn(stripePrice);
     }
 
