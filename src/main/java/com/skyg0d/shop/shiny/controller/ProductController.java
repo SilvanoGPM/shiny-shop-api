@@ -105,7 +105,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<UserProductResponse> create(@Valid @RequestBody CreateProductRequest request) throws StripeException {
+    public ResponseEntity<AdminProductResponse> create(@Valid @RequestBody CreateProductRequest request) throws StripeException {
         return new ResponseEntity<>(productService.create(request), HttpStatus.CREATED);
     }
 

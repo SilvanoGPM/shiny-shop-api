@@ -5,6 +5,7 @@ import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
 import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
+import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.MessageResponse;
@@ -12,12 +13,19 @@ import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.util.JWTCreator;
+import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.skyg0d.shop.shiny.wrapper.PageableResponse;
+import com.stripe.model.Price;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -38,6 +46,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Integration tests for ProductController")
 public class ProductControllerIT {
 
+    @MockBean
+    StripeUtils stripeUtils;
+
     @Autowired
     TestRestTemplate httpClient;
 
@@ -49,6 +60,24 @@ public class ProductControllerIT {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @BeforeEach
+    @SneakyThrows
+    void setUp() {
+        com.stripe.model.Product stripeProduct = new com.stripe.model.Product();
+        stripeProduct.setId(STRIPE_PRODUCT_ID);
+
+        Price stripePrice = new Price();
+        stripePrice.setId(STRIPE_PRICE_ID);
+
+        BDDMockito
+                .when(stripeUtils.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
+                .thenReturn(stripeProduct);
+
+        BDDMockito
+                .when(stripeUtils.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(stripePrice);
+    }
 
     @Test
     @DisplayName("listAllActive Returns List Of Products Inside Page Object When Successful")
@@ -223,16 +252,17 @@ public class ProductControllerIT {
         assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
     }
 
+    @SneakyThrows
     @Test
     @DisplayName("create Persists Product When Successful")
     void create_PersistsProduct_WhenSuccessful() {
-        UserProductResponse expectedProduct = createUserProductResponse();
+        AdminProductResponse expectedProduct = createAdminProductResponse();
 
-        ResponseEntity<UserProductResponse> entity = httpClient.exchange(
+        ResponseEntity<AdminProductResponse> entity = httpClient.exchange(
                 "/products",
                 HttpMethod.POST,
                 jwtCreator.createAdminAuthEntity(createCreateProductRequest()),
-                UserProductResponse.class
+                AdminProductResponse.class
         );
 
         assertThat(entity).isNotNull();
@@ -242,6 +272,10 @@ public class ProductControllerIT {
         assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody().getSlug()).isEqualTo(expectedProduct.getSlug());
+
+        assertThat(entity.getBody().getStripeProductId()).isEqualTo(expectedProduct.getStripeProductId());
+
+        assertThat(entity.getBody().getStripePriceId()).isEqualTo(expectedProduct.getStripePriceId());
     }
 
     @Test

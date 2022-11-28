@@ -1,7 +1,6 @@
 package com.skyg0d.shop.shiny.util.product;
 
 import com.skyg0d.shop.shiny.mapper.ProductMapper;
-import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
@@ -23,6 +22,11 @@ public class ProductCreator {
     public static final String BRAND = "Test Product Brand";
     public static final BigDecimal PRICE = BigDecimal.valueOf(10);
     public static final long AMOUNT = 10;
+
+    public static final String STRIPE_PRODUCT_ID = "test-stripe-product-id";
+
+    public static final String STRIPE_PRICE_ID = "test-stripe-price-id";
+
     public static final List<String> IMAGES = List.of("test-product-image");
     public static final List<String> SIZES = List.of("Test Product Size");
     public static final List<String> FEATURES = List.of("Test Product Feature");
@@ -40,6 +44,8 @@ public class ProductCreator {
                 .images(IMAGES)
                 .sizes(SIZES)
                 .features(FEATURES)
+                .stripeProductId(STRIPE_PRODUCT_ID)
+                .stripePriceId(STRIPE_PRICE_ID)
                 .categories(new HashSet<>())
                 .build();
     }
@@ -57,6 +63,8 @@ public class ProductCreator {
                 .images(IMAGES)
                 .sizes(SIZES)
                 .features(FEATURES)
+                .stripeProductId(STRIPE_PRODUCT_ID)
+                .stripePriceId(STRIPE_PRICE_ID)
                 .categories(new HashSet<>())
                 .build();
     }

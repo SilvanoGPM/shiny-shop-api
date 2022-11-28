@@ -43,6 +43,14 @@ public class StripeUtils {
         return Product.create(productParams);
     }
 
+    public void updateProduct(String productId, ProductUpdateParams params) throws StripeException {
+        retrieveProduct(productId).update(params);
+    }
+
+    public void deleteProduct(String productId) throws StripeException {
+       retrieveProduct(productId).delete();
+    }
+
     public void updateProductMetadata(String productId, Set<Category> categories) throws StripeException {
         String categoriesString = categories
                 .stream()
@@ -54,9 +62,7 @@ public class StripeUtils {
                 .putMetadata("categories", categoriesString)
                 .build();
 
-        retrieveProduct(productId)
-                .update(productParams);
-
+        updateProduct(productId, productParams);
     }
 
     public void setProductActive(String productId, boolean active) throws StripeException {
@@ -67,7 +73,7 @@ public class StripeUtils {
         return Price.create(PriceCreateParams
                 .builder()
                 .setProduct(productId)
-                .setUnitAmountDecimal(price.multiply(new BigDecimal(100)))
+                .setUnitAmountDecimal(new BigDecimal(100).multiply(price))
                 .setCurrency(stripeProps.getCurrency())
                 .build());
     }

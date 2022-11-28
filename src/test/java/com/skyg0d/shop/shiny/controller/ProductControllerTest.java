@@ -11,6 +11,7 @@ import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ public class ProductControllerTest {
     ProductService productService;
 
     @BeforeEach
+    @SneakyThrows
     void setUp() {
         PageImpl<UserProductResponse> userProductsPage = new PageImpl<>(List.of(createUserProductResponse()));
         PageImpl<AdminProductResponse> adminProductsPage = new PageImpl<>(List.of(createAdminProductResponse()));
@@ -65,7 +67,7 @@ public class ProductControllerTest {
 
         BDDMockito
                 .when(productService.create(ArgumentMatchers.any(CreateProductRequest.class)))
-                .thenReturn(createUserProductResponse());
+                .thenReturn(createAdminProductResponse());
 
         BDDMockito
                 .doNothing()
@@ -223,10 +225,11 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("create Persists Product When Successful")
+    @SneakyThrows
     void create_PersistsProduct_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
-        ResponseEntity<UserProductResponse> entity = productController.create(createCreateProductRequest());
+        ResponseEntity<AdminProductResponse> entity = productController.create(createCreateProductRequest());
 
         assertThat(entity).isNotNull();
 
@@ -239,6 +242,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("replace Updates Product When Successful")
+    @SneakyThrows
     void replace_UpdatesProduct_WhenSuccessful() {
         String expectedMessage = "Product replaced!";
 
@@ -255,6 +259,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("toggleActive Alternates Active When Successful")
+    @SneakyThrows
     void toggleActive_AlternatesActive_WhenSuccessful() {
         String expectedMessage = "Product visibility toggle!";
 
@@ -271,6 +276,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("applyDiscount Applies Discount To Product When Successful")
+    @SneakyThrows
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
         String expectedMessage = "Product discount applied!";
 
@@ -303,6 +309,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("addCategory Append Category To Product When Successful")
+    @SneakyThrows
     void addCategory_AppendCategoryToProduct_WhenSuccessful() {
         String expectedMessage = "Add category to product!";
 
@@ -319,6 +326,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("removeCategory Removes Category To Product When Successful")
+    @SneakyThrows
     void removeCategory_RemovesCategoryToProduct_WhenSuccessful() {
         String expectedMessage = "Remove product category!";
 
@@ -335,6 +343,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("delete Removes Product When Successful")
+    @SneakyThrows
     void delete_RemovesProduct_WhenSuccessful() {
         String expectedMessage = "Product removed!";
 

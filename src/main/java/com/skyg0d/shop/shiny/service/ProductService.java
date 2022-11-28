@@ -69,7 +69,7 @@ public class ProductService {
                 .map(mapper::toUserProductResponse);
     }
 
-    public UserProductResponse create(CreateProductRequest request) throws StripeException {
+    public AdminProductResponse create(CreateProductRequest request) throws StripeException {
         verifySlugExists(request.getSlug());
 
         Product productMapped = mapper.toProduct(request);
@@ -84,7 +84,7 @@ public class ProductService {
 
         Product productSaved = productRepository.save(productMapped);
 
-        return mapper.toUserProductResponse(productSaved);
+        return mapper.toAdminProductResponse(productSaved);
     }
 
     @Transactional
@@ -106,9 +106,6 @@ public class ProductService {
 
         Product productSaved = productRepository.save(productMapped);
 
-        com.stripe.model.Product stripeProduct =
-                stripeUtils.retrieveProduct(productSaved.getStripeProductId());
-
         ProductUpdateParams productUpdateParams = ProductUpdateParams
                 .builder()
                 .setName(productSaved.getName())
@@ -116,7 +113,7 @@ public class ProductService {
                 .setImages(productSaved.getImages())
                 .build();
 
-        stripeProduct.update(productUpdateParams);
+        stripeUtils.updateProduct(productSaved.getStripeProductId(), productUpdateParams);
     }
 
     public void toggleActive(String slug) throws StripeException {
@@ -183,11 +180,9 @@ public class ProductService {
 
         try {
             stripeUtils.desactivePrice(productFound.getStripePriceId());
-
-            com.stripe.model.Product stripeProduct = stripeUtils.retrieveProduct(productFound.getStripeProductId());
-            stripeProduct.update(ProductUpdateParams.builder().setDefaultPrice(EmptyParam.EMPTY).build());
-            stripeProduct.delete();
-        } catch (StripeException ex) {
+            stripeUtils.updateProduct(productFound.getStripeProductId(), ProductUpdateParams.builder().setDefaultPrice(EmptyParam.EMPTY).build());
+            stripeUtils.deleteProduct(productFound.getStripeProductId());
+        } catch (Exception ex) {
             stripeUtils.setProductActive(productFound.getStripeProductId(), false);
         }
 

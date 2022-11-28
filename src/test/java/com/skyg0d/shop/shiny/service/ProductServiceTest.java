@@ -4,10 +4,16 @@ import com.skyg0d.shop.shiny.exception.ProductCategoryNotFoundException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
+import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
+import com.skyg0d.shop.shiny.util.StripeUtils;
 import com.skyg0d.shop.shiny.util.category.CategoryCreator;
+import com.stripe.model.Price;
+import com.stripe.param.ProductUpdateParams;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -44,9 +51,15 @@ public class ProductServiceTest {
     @Mock
     CategoryService categoryService;
 
+    @Mock
+    StripeUtils stripeUtils;
+
     @BeforeEach
+    @SneakyThrows
     void setUp() {
         PageImpl<Product> productsPage = new PageImpl<>(List.of(createProduct()));
+
+        com.stripe.model.Product stripeProductMock = new com.stripe.model.Product();
 
         BDDMockito
                 .when(productRepository.findAll(ArgumentMatchers.any(Pageable.class)))
@@ -67,6 +80,38 @@ public class ProductServiceTest {
         BDDMockito
                 .when(productRepository.existsBySlug(ArgumentMatchers.anyString()))
                 .thenReturn(false);
+
+        BDDMockito
+                .when(stripeUtils.createProduct(ArgumentMatchers.any(CreateProductRequest.class)))
+                .thenReturn(stripeProductMock);
+
+        BDDMockito
+                .when(stripeUtils.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(new Price());
+
+        BDDMockito
+                .doNothing()
+                .when(stripeUtils)
+                .desactivePrice(ArgumentMatchers.anyString());
+
+        BDDMockito
+                .doNothing()
+                .when(stripeUtils)
+                .setProductActive(ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean());
+
+        BDDMockito
+                .doNothing()
+                .when(stripeUtils)
+                .updateProduct(ArgumentMatchers.anyString(), ArgumentMatchers.any(ProductUpdateParams.class));
+
+        BDDMockito
+                .doNothing()
+                .when(stripeUtils)
+                .deleteProduct(ArgumentMatchers.anyString());
+
+        BDDMockito
+                .when(stripeUtils.retrieveProduct(ArgumentMatchers.anyString()))
+                .thenReturn(stripeProductMock);
 
         BDDMockito
                 .when(productRepository.save(ArgumentMatchers.any(Product.class)))
@@ -196,10 +241,11 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("create Persists Product When Successful")
+    @SneakyThrows
     void create_PersistsProduct_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
-        UserProductResponse productFound = productService.create(createCreateProductRequest());
+        AdminProductResponse productFound = productService.create(createCreateProductRequest());
 
         assertThat(productFound).isNotNull();
 
@@ -210,6 +256,12 @@ public class ProductServiceTest {
     @DisplayName("replace Updates Product When Successful")
     void replace_UpdatesProduct_WhenSuccessful() {
         assertThatCode(() -> productService.replace(createReplaceProductRequest()))
+                .doesNotThrowAnyException();
+
+        ReplaceProductRequest secondRequest = createReplaceProductRequest();
+        secondRequest.setPrice(new BigDecimal(400));
+
+        assertThatCode(() -> productService.replace(secondRequest))
                 .doesNotThrowAnyException();
     }
 
@@ -265,7 +317,16 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("delete Removes Product When Successful")
+    @SneakyThrows
     void delete_RemovesProduct_WhenSuccessful() {
+        assertThatCode(() -> productService.delete("test-slug"))
+                .doesNotThrowAnyException();
+
+        BDDMockito
+                .willThrow(new RuntimeException())
+                .given(stripeUtils)
+                .desactivePrice(ArgumentMatchers.anyString());
+
         assertThatCode(() -> productService.delete("test-slug"))
                 .doesNotThrowAnyException();
     }
