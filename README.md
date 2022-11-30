@@ -64,6 +64,7 @@ app:
 * [MySQL](https://www.mysql.com/)
 * [JJWT](https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt)
 * [Map Struct](https://mapstruct.org/)
+* [Stripe](https://stripe.com)
 
 ## :heart: Obrigado
 
