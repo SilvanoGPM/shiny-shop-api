@@ -55,6 +55,16 @@ app:
     refreshExpirationMs: 2592000000 # 30 days
 ```
 
+Você também deve adicionar as configurações do Stripe para conseguir executar o projeto:
+
+```yml
+app:
+  stripe:
+    publicKey: YOUR_STRIPE_PUBLIC_KEY
+    secretKey: YOUR_STRIPE_PRIVATE_KEY
+    webhookSecret: YOUR_STRIPE_WEBHOOK_SECRET
+```
+
 ## :rocket: Tecnologias
 
 * [Spring Boot](https://spring.io/projects/spring-boot)
