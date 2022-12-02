@@ -26,4 +26,6 @@ public class OrderResponse {
 
     private EOrderStatus status;
 
+    private String paymentLink;
+
 }

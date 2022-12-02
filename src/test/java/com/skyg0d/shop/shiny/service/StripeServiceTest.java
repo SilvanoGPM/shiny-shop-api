@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 public class StripeServiceTest {
 
     @InjectMocks
-    StripeService stripeService = new StripeService(new StripeProps("pk_test", "sk_test", "BRL"));
+    StripeService stripeService = new StripeService(new StripeProps("pk_test", "sk_test", "BRL", "", ""));
 
     @Test
     @DisplayName("retrieveProduct Returns Stripe Product When Successful")

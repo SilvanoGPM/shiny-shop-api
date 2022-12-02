@@ -9,6 +9,7 @@ import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.OrderService;
 import com.skyg0d.shop.shiny.util.AuthUtils;
+import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -108,7 +109,7 @@ public class OrderController {
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest request) {
+    public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest request) throws StripeException {
         return new ResponseEntity<>(orderService.create(request, authUtils.getUserDetails().getEmail()), HttpStatus.CREATED);
     }
 

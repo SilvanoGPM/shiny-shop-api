@@ -16,5 +16,7 @@ public class StripeProps {
     private String publicKey;
     private String secretKey;
     private String currency = "BRL";
+    private String redirectUrl = "https://dashboard.stripe.com/test/payments";
+    private String webhookSecret;
 
 }

@@ -37,7 +37,9 @@ public class Order extends BaseEntity {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(255) default 'SHIPPING'")
+    @Column(columnDefinition = "varchar(255) default 'WAITING'")
     private EOrderStatus status;
+
+    private MyPaymentLink paymentLink;
 
 }

@@ -6,6 +6,8 @@ import com.skyg0d.shop.shiny.model.Role;
 import com.skyg0d.shop.shiny.payload.response.OrderProductResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -17,6 +19,7 @@ public abstract class OrderMapper {
 
     public static final OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
+    @Mapping(source = "paymentLink.paymentUrl", target = "paymentLink", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     public abstract OrderResponse toOrderResponse(Order order);
 
     List<OrderProductResponse> map(List<Product> products) {

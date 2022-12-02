@@ -2,10 +2,7 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.mapper.OrderMapper;
-import com.skyg0d.shop.shiny.model.EOrderStatus;
-import com.skyg0d.shop.shiny.model.Order;
-import com.skyg0d.shop.shiny.model.Product;
-import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.model.*;
 import com.skyg0d.shop.shiny.payload.ProductCalculate;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
@@ -15,11 +12,15 @@ import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.repository.specification.OrderSpecification;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.AuthUtils;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentLink;
+import com.stripe.param.PaymentLinkCreateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class OrderService {
     private final UserService userService;
 
     private final AuthUtils authUtils;
+
+    private final StripeService stripeService;
 
     private final OrderMapper mapper = OrderMapper.INSTANCE;
 
@@ -63,7 +66,8 @@ public class OrderService {
         return orderRepository.findAll(OrderSpecification.getSpecification(search), pageable).map(mapper::toOrderResponse);
     }
 
-    public OrderResponse create(CreateOrderRequest request, String email) {
+    @Transactional
+    public OrderResponse create(CreateOrderRequest request, String email) throws StripeException {
         User user = userService.findByEmail(email);
 
         List<ProductCalculate> products = getProducts(request.getProducts());
@@ -95,13 +99,24 @@ public class OrderService {
 
         Order order = Order
                 .builder()
-                .status(EOrderStatus.SHIPPING)
+                .status(EOrderStatus.WAITING)
                 .price(price)
                 .products(productsIds)
                 .user(user)
                 .build();
 
-        return mapper.toOrderResponse(orderRepository.save(order));
+        Order orderSaved = orderRepository.save(order);
+        PaymentLink paymentLink = createPaymentLink(request, email, orderSaved.getId().toString());
+
+        orderSaved.setPaymentLink(
+                MyPaymentLink
+                        .builder()
+                        .paymentId(paymentLink.getId())
+                        .paymentUrl(paymentLink.getUrl())
+                        .build()
+        );
+
+        return mapper.toOrderResponse(orderRepository.save(orderSaved));
     }
 
     public void cancelOrder(String id) throws OrderStatusException {
@@ -126,6 +141,14 @@ public class OrderService {
         updateStatus(orderFound, EOrderStatus.CANCELED);
     }
 
+    public void removePaymentLink(String id) {
+        Order orderFound = findById(id);
+
+        orderFound.setProducts(null);
+
+        orderRepository.save(orderFound);
+    }
+
     public void adminChangeStatus(String id, EOrderStatus status, String errMessage) {
         Order orderFound = findById(id);
 
@@ -134,6 +157,27 @@ public class OrderService {
         }
 
         updateStatus(orderFound, status);
+    }
+
+    private PaymentLink createPaymentLink(CreateOrderRequest request, String email, String orderId) throws StripeException {
+        List<ProductCalculate> products = getProducts(request.getProducts());
+
+        List<PaymentLinkCreateParams.LineItem> productsStripePrices = products
+                .stream()
+                .map((rawProduct) -> {
+                    String stripePriceId = productService.findBySlug(rawProduct.getSlug()).getStripePriceId();
+
+                    return PaymentLinkCreateParams.LineItem
+                            .builder()
+                            .setPrice(stripePriceId)
+                            .setQuantity(rawProduct.getAmount())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        PaymentLink paymentLink = stripeService.createPaymentLink(productsStripePrices, email, orderId);
+
+        return paymentLink;
     }
 
     private void updateStatus(Order order, EOrderStatus status) {
@@ -186,5 +230,4 @@ public class OrderService {
             throw new ProductOverflowAmountException(product.getSlug(), product.getAmount());
         }
     }
-
 }
