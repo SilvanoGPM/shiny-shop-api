@@ -7,7 +7,6 @@ import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
@@ -182,45 +181,37 @@ public class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("existsBySlug Says Product Don't Exists When Successful")
-    void existsBySlug_SaysProductDoNotExists_WhenSuccessful() {
+    @DisplayName("existsBySlug Returns 404 NotFound When Product Don't Exists")
+    void existsBySlug_Returns400NotFound_WhenProductDoNotExists() {
         BDDMockito
                 .doNothing()
                 .when(productService)
                 .verifySlugExists(ArgumentMatchers.anyString());
 
-        String expectedMessage = "Product don't exists";
-
-        ResponseEntity<MessageResponse> entity = productController.existsBySlug("test-slug");
+        ResponseEntity<Void> entity = productController.existsBySlug("test-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
-    @DisplayName("existsBySlug Says Product Exists When Product Slug Already Exists")
-    void existsBySlug_SaysProductExists_WhenProductSlugAlreadyExists() {
+    @DisplayName("existsBySlug Returns 200 Ok When Product Exists")
+    void existsBySlug_Returns200Ok_WhenProductExists() {
         BDDMockito
                 .doThrow(SlugAlreadyExistsException.class)
                 .when(productService)
                 .verifySlugExists(ArgumentMatchers.anyString());
 
-        String expectedMessage = "Product exists";
-
-        ResponseEntity<MessageResponse> entity = productController.existsBySlug("test-slug");
+        ResponseEntity<Void> entity = productController.existsBySlug("test-slug");
 
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -244,118 +235,90 @@ public class ProductControllerTest {
     @DisplayName("replace Updates Product When Successful")
     @SneakyThrows
     void replace_UpdatesProduct_WhenSuccessful() {
-        String expectedMessage = "Product replaced!";
-
-        ResponseEntity<MessageResponse> entity = productController.replace(createReplaceProductRequest());
+        ResponseEntity<Void> entity = productController.replace(createReplaceProductRequest());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("toggleActive Alternates Active When Successful")
     @SneakyThrows
     void toggleActive_AlternatesActive_WhenSuccessful() {
-        String expectedMessage = "Product visibility toggle!";
-
-        ResponseEntity<MessageResponse> entity = productController.toggleActive("test-slug");
+        ResponseEntity<Void> entity = productController.toggleActive("test-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("applyDiscount Applies Discount To Product When Successful")
     @SneakyThrows
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
-        String expectedMessage = "Product discount applied!";
-
-        ResponseEntity<MessageResponse> entity = productController.applyDiscount("test-slug", new ApplyDiscountRequest(10));
+        ResponseEntity<Void> entity = productController.applyDiscount("test-slug", new ApplyDiscountRequest(10));
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("changeAmount Updates Product Amount When Successful")
     void changeAmount_UpdatesProductAmount_WhenSuccessful() {
-        String expectedMessage = "Product amount changed!";
-
-        ResponseEntity<MessageResponse> entity = productController.changeAmount("test-slug", new ChangeAmountRequest(10));
+        ResponseEntity<Void> entity = productController.changeAmount("test-slug", new ChangeAmountRequest(10));
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("addCategory Append Category To Product When Successful")
     @SneakyThrows
     void addCategory_AppendCategoryToProduct_WhenSuccessful() {
-        String expectedMessage = "Add category to product!";
-
-        ResponseEntity<MessageResponse> entity = productController.addCategory("test-product-slug", "test-category-slug");
+        ResponseEntity<Void> entity = productController.addCategory("test-product-slug", "test-category-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("removeCategory Removes Category To Product When Successful")
     @SneakyThrows
     void removeCategory_RemovesCategoryToProduct_WhenSuccessful() {
-        String expectedMessage = "Remove product category!";
-
-        ResponseEntity<MessageResponse> entity = productController.removeCategory("test-product-slug", "test-category-slug");
+        ResponseEntity<Void> entity = productController.removeCategory("test-product-slug", "test-category-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("delete Removes Product When Successful")
     @SneakyThrows
     void delete_RemovesProduct_WhenSuccessful() {
-        String expectedMessage = "Product removed!";
-
-        ResponseEntity<MessageResponse> entity = productController.delete("test-slug");
+        ResponseEntity<Void> entity = productController.delete("test-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
 }

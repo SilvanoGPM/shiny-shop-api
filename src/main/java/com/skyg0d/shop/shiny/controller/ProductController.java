@@ -68,22 +68,20 @@ public class ProductController {
         return ResponseEntity.ok(productService.findBySlugMapped(slug));
     }
 
-    @GetMapping("/{slug}/exists")
+    @RequestMapping(value = "/{slug}", method = RequestMethod.HEAD)
     @Operation(summary = "Verify if product exists by slug", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "200", description = "Product exists, not available"),
+            @ApiResponse(responseCode = "404", description = "Product not exists, available"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> existsBySlug(@PathVariable String slug) {
-        String message = "Product don't exists";
-
+    public ResponseEntity<Void> existsBySlug(@PathVariable String slug) {
         try {
             productService.verifySlugExists(slug);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (SlugAlreadyExistsException ex) {
-            message = "Product exists";
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-
-        return ResponseEntity.ok(new MessageResponse(message));
     }
 
     @GetMapping("/search")
@@ -113,105 +111,105 @@ public class ProductController {
     @IsStaff
     @Operation(summary = "Updates product", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceProductRequest request) throws StripeException {
+    public ResponseEntity<Void> replace(@Valid @RequestBody ReplaceProductRequest request) throws StripeException {
         productService.replace(request);
 
-        return ResponseEntity.ok(new MessageResponse("Product replaced!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{slug}/toggle/active")
     @IsStaff
     @Operation(summary = "Toggle product active", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> toggleActive(@PathVariable String slug) throws StripeException {
+    public ResponseEntity<Void> toggleActive(@PathVariable String slug) throws StripeException {
         productService.toggleActive(slug);
 
-        return ResponseEntity.ok(new MessageResponse("Product visibility toggle!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{slug}/apply/discount")
     @IsStaff
     @Operation(summary = "Apply discount to product", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) {
+    public ResponseEntity<Void> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) {
         productService.applyDiscount(slug, request.getDiscount());
 
-        return ResponseEntity.ok(new MessageResponse("Product discount applied!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{slug}/change/amount")
     @IsStaff
     @Operation(summary = "Change product amount", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> changeAmount(@PathVariable String slug, @Valid @RequestBody ChangeAmountRequest request) {
+    public ResponseEntity<Void> changeAmount(@PathVariable String slug, @Valid @RequestBody ChangeAmountRequest request) {
         productService.changeAmount(slug, request.getAmount());
 
-        return ResponseEntity.ok(new MessageResponse("Product amount changed!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{productSlug}/add/{categorySlug}/category")
     @IsStaff
     @Operation(summary = "Add category to product", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
+    public ResponseEntity<Void> addCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
         productService.addCategory(productSlug, categorySlug);
 
-        return ResponseEntity.ok(new MessageResponse("Add category to product!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{productSlug}/remove/{categorySlug}/category")
     @IsStaff
     @Operation(summary = "Removes category of product", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
+    public ResponseEntity<Void> removeCategory(@PathVariable String productSlug, @PathVariable String categorySlug) throws StripeException {
         productService.removeCategory(productSlug, categorySlug);
 
-        return ResponseEntity.ok(new MessageResponse("Remove product category!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{slug}")
     @IsAdmin
     @Operation(summary = "Removes product", tags = "Products")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> delete(@PathVariable String slug) throws StripeException {
+    public ResponseEntity<Void> delete(@PathVariable String slug) throws StripeException {
         productService.delete(slug);
 
-        return ResponseEntity.ok(new MessageResponse("Product removed!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

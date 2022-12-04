@@ -311,23 +311,19 @@ public class OrderControllerIT {
     @Test
     @DisplayName("cancelOrder Updates Order Status When Successful")
     void cancelOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order canceled";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/orders/{id}/cancel",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 persistOrder().getId()
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -377,23 +373,19 @@ public class OrderControllerIT {
     @Test
     @DisplayName("shipOrder Updates Order Status When Successful")
     void shipOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order shipped";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/orders/{id}/ship",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 persistOrder().getId()
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -421,23 +413,19 @@ public class OrderControllerIT {
     @Test
     @DisplayName("onTheWayOrder Updates Order Status When Successful")
     void onTheWayOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order on the way";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/orders/{id}/otw",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 persistOrder().getId()
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -465,23 +453,19 @@ public class OrderControllerIT {
     @Test
     @DisplayName("deliverOrder Updates Order Status When Successful")
     void deliverOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order delivered";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/orders/{id}/deliver",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 persistOrder().getId()
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test

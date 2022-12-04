@@ -129,19 +129,15 @@ public class AuthControllerTest {
     @Test
     @DisplayName("logout Removes Refresh Token When Successful")
     void logout_RemovesRefreshToken_WhenSuccessful() {
-        String expectedMessage = "Log out successful";
-
         MockUtils.mockSecurityContextHolder();
 
-        ResponseEntity<MessageResponse> entity = authController.logout();
+        ResponseEntity<Void> entity = authController.logout();
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
 }

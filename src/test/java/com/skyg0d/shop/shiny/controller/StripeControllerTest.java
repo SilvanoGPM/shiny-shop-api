@@ -93,7 +93,7 @@ public class StripeControllerTest {
 
             assertThat(entity.getBody()).isNull();
 
-            assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         }
     }
 

@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 import com.skyg0d.shop.shiny.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,22 +49,20 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.findBySlugMapped(slug));
     }
 
-    @GetMapping("/{slug}/exists")
+    @RequestMapping(value = "/{slug}", method = RequestMethod.HEAD)
     @Operation(summary = "Verify if category exists by slug", tags = "Categories")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "200", description = "Category exists, not available"),
+            @ApiResponse(responseCode = "404", description = "Category not exists, available"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> existsBySlug(@PathVariable String slug) {
-        String message = "Category don't exists";
-
+    public ResponseEntity<Void> existsBySlug(@PathVariable String slug) {
         try {
             categoryService.verifySlugExists(slug);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (SlugAlreadyExistsException ex) {
-            message = "Category exists";
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-
-        return ResponseEntity.ok(new MessageResponse(message));
     }
 
     @GetMapping("/search")
@@ -95,30 +92,30 @@ public class CategoryController {
     @IsAdmin
     @Operation(summary = "Updates category", tags = "Categories")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceCategoryRequest request) {
+    public ResponseEntity<Void> replace(@Valid @RequestBody ReplaceCategoryRequest request) {
         categoryService.replace(request);
 
-        return ResponseEntity.ok(new MessageResponse("Category replaced!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{slug}")
     @IsAdmin
     @Operation(summary = "Removes category", tags = "Categories")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> delete(@PathVariable String slug) {
+    public ResponseEntity<Void> delete(@PathVariable String slug) {
         categoryService.delete(slug);
 
-        return ResponseEntity.ok(new MessageResponse("Category removed!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

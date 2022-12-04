@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
 import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
@@ -80,16 +79,16 @@ public class AuthController {
     @DeleteMapping("/logout")
     @Operation(summary = "User logout", tags = "Auth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "400", description = "When user not logged in"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> logout() {
+    public ResponseEntity<Void> logout() {
         UserDetailsImpl userDetails = authUtils.getUserDetails();
 
         authService.logout(userDetails.getEmail());
 
-        return ResponseEntity.ok(new MessageResponse("Log out successful"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

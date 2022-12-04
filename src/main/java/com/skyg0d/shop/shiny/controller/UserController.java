@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -112,48 +113,48 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #request.email == authentication.principal.email")
     @Operation(summary = "Promote user to others roles", tags = "Users")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "400", description = "When user not found"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> replace(@Valid @RequestBody ReplaceUserRequest request) {
+    public ResponseEntity<Void> replace(@Valid @RequestBody ReplaceUserRequest request) {
         userService.replace(request);
 
-        return ResponseEntity.ok(new MessageResponse("User replaced!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/promote")
     @IsAdmin
     @Operation(summary = "Promote user to others roles", tags = "Users")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "400", description = "When user not found"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> promote(@Valid @RequestBody PromoteRequest request) {
+    public ResponseEntity<Void> promote(@Valid @RequestBody PromoteRequest request) {
         userService.promote(request.getEmail(), request.getRoles());
 
-        return ResponseEntity.ok(new MessageResponse("User promoted!"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/logout/{email}")
     @IsAdmin
     @Operation(summary = "User logout", tags = "Users")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "204", description = "Successful"),
             @ApiResponse(responseCode = "400", description = "When user not found"),
             @ApiResponse(responseCode = "401", description = "When not authorized"),
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<MessageResponse> logout(@PathVariable String email) {
+    public ResponseEntity<Void> logout(@PathVariable String email) {
         authService.logout(email);
 
-        return ResponseEntity.ok(new MessageResponse("Log out successful"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

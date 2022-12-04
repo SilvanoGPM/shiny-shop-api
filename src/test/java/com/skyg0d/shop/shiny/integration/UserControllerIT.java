@@ -175,77 +175,65 @@ public class UserControllerIT {
     @Test
     @DisplayName("replace Updates User When Successful")
     void replace_UpdatesUser_WhenSuccessful() {
-        String expectedMessage = "User replaced!";
-
         ReplaceUserRequest request = createReplaceUserRequest();
 
         request.setEmail(jwtCreator.createUser().getEmail());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/users",
                 HttpMethod.PUT,
                 jwtCreator.createAdminAuthEntity(request),
-                MessageResponse.class
+                Void.class
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("promote Updates User Roles When Successful")
     void promote_UpdatesUserRoles_WhenSuccessful() {
-        String expectedMessage = "User promoted!";
-
         PromoteRequest promoteRequest = PromoteRequest
                 .builder()
                 .roles(Set.of("mod"))
                 .email(findUserByEmail("user@mail.com").getEmail())
                 .build();
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/users/promote",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(promoteRequest),
-                MessageResponse.class
+                Void.class
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("logout Removes Refresh Token When Successful")
     void logout_RemovesRefreshToken_WhenSuccessful() {
-        String expectedMessage = "Log out successful";
-
         String email = findUserByEmail("user@mail.com").getEmail();
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/users/logout/{email}",
                 HttpMethod.DELETE,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 email
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     private User findUserByEmail(String email) throws RuntimeException {

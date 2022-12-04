@@ -60,7 +60,7 @@ public class StripeController {
             orderService.removePaymentLink(orderId);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private <T> Map<String, T> getMap(Object value) {

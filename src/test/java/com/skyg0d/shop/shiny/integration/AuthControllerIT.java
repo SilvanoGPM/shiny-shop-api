@@ -7,7 +7,6 @@ import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
 import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;
@@ -119,22 +118,18 @@ public class AuthControllerIT {
     @Test
     @DisplayName("logout Removes Refresh Token When Successful")
     void logout_RemovesRefreshToken_WhenSuccessful() {
-        String expectedMessage = "Log out successful";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/auth/logout",
                 HttpMethod.DELETE,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class
+                Void.class
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test

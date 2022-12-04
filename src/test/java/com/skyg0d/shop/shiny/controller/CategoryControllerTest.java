@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.payload.request.CreateCategoryRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceCategoryRequest;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.search.CategoryParameterSearch;
 import com.skyg0d.shop.shiny.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,45 +126,37 @@ public class CategoryControllerTest {
     }
 
     @Test
-    @DisplayName("existsBySlug Says Category Don't Exists When Successful")
-    void existsBySlug_SaysCategoryDoNotExists_WhenSuccessful() {
+    @DisplayName("existsBySlug Returns 404 Not Found When Category Not Exists")
+    void existsBySlug_Returns404NotFound_WhenCategoryNotExists() {
         BDDMockito
                 .doNothing()
                 .when(categoryService)
                 .verifySlugExists(ArgumentMatchers.anyString());
 
-        String expectedMessage = "Category don't exists";
-
-        ResponseEntity<MessageResponse> entity = categoryController.existsBySlug("test-slug");
+        ResponseEntity<Void> entity = categoryController.existsBySlug("test-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
-    @DisplayName("existsBySlug Says Category Exists When Category Slug Already Exists")
-    void existsBySlug_SaysCategoryExists_WhenCategorySlugAlreadyExists() {
+    @DisplayName("existsBySlug Returns 200 Ok When Slug Already Exists")
+    void existsBySlug_Returns200Ok_WhenCategorySlugAlreadyExists() {
         BDDMockito
                 .doThrow(SlugAlreadyExistsException.class)
                 .when(categoryService)
                 .verifySlugExists(ArgumentMatchers.anyString());
 
-        String expectedMessage = "Category exists";
-
-        ResponseEntity<MessageResponse> entity = categoryController.existsBySlug("test-slug");
+        ResponseEntity<Void> entity = categoryController.existsBySlug("test-slug");
 
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -187,33 +178,27 @@ public class CategoryControllerTest {
     @Test
     @DisplayName("replace Updates Category When Successful")
     void replace_UpdatesCategory_WhenSuccessful() {
-        String expectedMessage = "Category replaced!";
-
-        ResponseEntity<MessageResponse> entity = categoryController.replace(createReplaceCategoryRequest());
+        ResponseEntity<Void> entity = categoryController.replace(createReplaceCategoryRequest());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("delete Removes Category When Successful")
     void delete_RemovesCategory_WhenSuccessful() {
-        String expectedMessage = "Category removed!";
 
-        ResponseEntity<MessageResponse> entity = categoryController.delete("test-slug");
+        ResponseEntity<Void> entity = categoryController.delete("test-slug");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
+        assertThat(entity.getBody()).isNull();
 
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
     }
 
 }

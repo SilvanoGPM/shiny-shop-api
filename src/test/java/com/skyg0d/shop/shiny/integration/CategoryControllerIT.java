@@ -134,39 +134,33 @@ public class CategoryControllerIT {
     }
 
     @Test
-    @DisplayName("existsBySlug Says Category Don't Exists When Successful")
-    void existsBySlug_SaysCategoryDoNotExists_WhenSuccessful() {
-        String expectedMessage = "Category don't exists";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
-                "/categories/{slug}/exists",
-                HttpMethod.GET,
+    @DisplayName("existsBySlug Returns 404 Not Found When Category Not Exists")
+    void existsBySlug_Returns404NotFound_WhenCategoryNotExists() {
+        ResponseEntity<Void> entity = httpClient.exchange(
+                "/categories/{slug}",
+                HttpMethod.HEAD,
                 null,
-                MessageResponse.class,
+                Void.class,
                 "test-slug"
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
-    @DisplayName("existsBySlug Says Category Exists When Category Slug Already Exists")
-    void existsBySlug_SaysCategoryExists_WhenCategorySlugAlreadyExists() {
-        String expectedMessage = "Category exists";
-
+    @DisplayName("existsBySlug Returns 200 Ok When Slug Already Exists")
+    void existsBySlug_Returns200Ok_WhenCategorySlugAlreadyExists() {
         Category categorySaved = categoryRepository.save(createCategory());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
-                "/categories/{slug}/exists",
+        ResponseEntity<Void> entity = httpClient.exchange(
+                "/categories/{slug}",
                 HttpMethod.GET,
                 null,
-                MessageResponse.class,
+                Void.class,
                 categorySaved.getSlug()
         );
 
@@ -174,9 +168,7 @@ public class CategoryControllerIT {
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
@@ -203,48 +195,40 @@ public class CategoryControllerIT {
     @Test
     @DisplayName("replace Updates Category When Successful")
     void replace_UpdatesCategory_WhenSuccessful() {
-        String expectedMessage = "Category replaced!";
-
         categoryRepository.save(createCategory());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/categories",
                 HttpMethod.PUT,
                 jwtCreator.createAdminAuthEntity(createReplaceCategoryRequest()),
-                MessageResponse.class
+                Void.class
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("delete Removes Category When Successful")
     void delete_RemovesCategory_WhenSuccessful() {
-        String expectedMessage = "Category removed!";
-
         Category categorySaved = categoryRepository.save(createCategory());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/categories/{slug}",
                 HttpMethod.DELETE,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 categorySaved.getSlug()
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
 }

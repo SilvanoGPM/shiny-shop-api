@@ -3,7 +3,6 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
@@ -206,65 +205,50 @@ public class OrderControllerTest {
     @Test
     @DisplayName("cancelOrder Updates Order Status When Successful")
     void cancelOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order canceled";
-
-        ResponseEntity<MessageResponse> entity = orderController.cancelOrder(UUID.randomUUID().toString());
+        ResponseEntity<Void> entity = orderController.cancelOrder(UUID.randomUUID().toString());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("shipOrder Updates Order Status When Successful")
     void shipOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order shipped";
-
-        ResponseEntity<MessageResponse> entity = orderController.shipOrder(UUID.randomUUID().toString());
+        ResponseEntity<Void> entity = orderController.shipOrder(UUID.randomUUID().toString());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("onTheWayOrder Updates Order Status When Successful")
     void onTheWayOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order on the way";
 
-        ResponseEntity<MessageResponse> entity = orderController.onTheWayOrder(UUID.randomUUID().toString());
+        ResponseEntity<Void> entity = orderController.onTheWayOrder(UUID.randomUUID().toString());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("deliverOrder Updates Order Status When Successful")
     void deliverOrder_UpdatesOrderStatus_WhenSuccessful() {
-        String expectedMessage = "Order delivered";
-
-        ResponseEntity<MessageResponse> entity = orderController.deliverOrder(UUID.randomUUID().toString());
+        ResponseEntity<Void> entity = orderController.deliverOrder(UUID.randomUUID().toString());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
 }

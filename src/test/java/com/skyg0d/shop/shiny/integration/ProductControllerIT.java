@@ -207,39 +207,33 @@ public class ProductControllerIT {
     }
 
     @Test
-    @DisplayName("existsBySlug Says Product Don't Exists When Successful")
-    void existsBySlug_SaysProductDoNotExists_WhenSuccessful() {
-        String expectedMessage = "Product don't exists";
-
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
-                "/products/{slug}/exists",
-                HttpMethod.GET,
+    @DisplayName("existsBySlug Returns 404 NotFound When Product Don't Exists")
+    void existsBySlug_Returns400NotFound_WhenProductDoNotExists() {
+        ResponseEntity<Void> entity = httpClient.exchange(
+                "/products/{slug}",
+                HttpMethod.HEAD,
                 null,
-                MessageResponse.class,
+                Void.class,
                 "some-slug"
         );
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
-    @DisplayName("existsBySlug Says Product Exists When Product Slug Already Exists")
-    void existsBySlug_SaysProductExists_WhenProductSlugAlreadyExists() {
-        String expectedMessage = "Product exists";
-
+    @DisplayName("existsBySlug Returns 200 Ok When Product Exists")
+    void existsBySlug_Returns200Ok_WhenProductExists() {
         Product productSaved = productRepository.save(createProductToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
-                "/products/{slug}/exists",
-                HttpMethod.GET,
+        ResponseEntity<Void> entity = httpClient.exchange(
+                "/products/{slug}",
+                HttpMethod.HEAD,
                 null,
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug()
         );
 
@@ -247,9 +241,7 @@ public class ProductControllerIT {
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @SneakyThrows
@@ -281,8 +273,6 @@ public class ProductControllerIT {
     @Test
     @DisplayName("replace Updates Product When Successful")
     void replace_UpdatesProduct_WhenSuccessful() {
-        String expectedMessage = "Product replaced!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
         ReplaceProductRequest replaceProductRequest = createReplaceProductRequest();
@@ -300,11 +290,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -316,15 +304,13 @@ public class ProductControllerIT {
     @Test
     @DisplayName("toggleActive Alternates Active When Successful")
     void toggleActive_AlternatesActive_WhenSuccessful() {
-        String expectedMessage = "Product visibility toggle!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{slug}/toggle/active",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug()
         );
 
@@ -332,11 +318,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -348,15 +332,13 @@ public class ProductControllerIT {
     @Test
     @DisplayName("applyDiscount Applies Discount To Product When Successful")
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
-        String expectedMessage = "Product discount applied!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{slug}/apply/discount",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(new ApplyDiscountRequest(10)),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug()
         );
 
@@ -364,11 +346,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -380,15 +360,13 @@ public class ProductControllerIT {
     @Test
     @DisplayName("changeAmount Updates Product Amount When Successful")
     void changeAmount_UpdatesProductAmount_WhenSuccessful() {
-        String expectedMessage = "Product amount changed!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{slug}/change/amount",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(new ChangeAmountRequest(15)),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug()
         );
 
@@ -396,11 +374,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -412,17 +388,15 @@ public class ProductControllerIT {
     @Test
     @DisplayName("addCategory Append Category To Product When Successful")
     void addCategory_AppendCategoryToProduct_WhenSuccessful() {
-        String expectedMessage = "Add category to product!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
         Category categorySaved = categoryRepository.save(createCategoryToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{productSlug}/add/{categorySlug}/category",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug(),
                 categorySaved.getSlug()
         );
@@ -431,11 +405,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -449,8 +421,6 @@ public class ProductControllerIT {
     @Test
     @DisplayName("removeCategory Removes Category To Product When Successful")
     void removeCategory_RemovesCategoryToProduct_WhenSuccessful() {
-        String expectedMessage = "Remove product category!";
-
         Category categorySaved = categoryRepository.save(createCategoryToBeSave());
 
         Product productToBeSave = createProductToBeSave();
@@ -459,11 +429,11 @@ public class ProductControllerIT {
 
         Product productSaved = productRepository.save(productToBeSave);
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{productSlug}/remove/{categorySlug}/category",
                 HttpMethod.PATCH,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug(),
                 categorySaved.getSlug()
         );
@@ -472,11 +442,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isNotEmpty();
 
@@ -513,15 +481,13 @@ public class ProductControllerIT {
     @Test
     @DisplayName("delete Removes Product When Successful")
     void delete_RemovesProduct_WhenSuccessful() {
-        String expectedMessage = "Product removed!";
-
         Product productSaved = productRepository.save(createProductToBeSave());
 
-        ResponseEntity<MessageResponse> entity = httpClient.exchange(
+        ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{slug}",
                 HttpMethod.DELETE,
                 jwtCreator.createAdminAuthEntity(null),
-                MessageResponse.class,
+                Void.class,
                 productSaved.getSlug()
         );
 
@@ -529,11 +495,9 @@ public class ProductControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
 
         assertThat(productFound).isEmpty();
     }

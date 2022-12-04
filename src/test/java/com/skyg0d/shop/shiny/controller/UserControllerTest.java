@@ -2,7 +2,6 @@ package com.skyg0d.shop.shiny.controller;
 
 import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.payload.search.UserParameterSearch;
@@ -195,49 +194,37 @@ public class UserControllerTest {
     @Test
     @DisplayName("replace Updates User When Successful")
     void replace_UpdatesUser_WhenSuccessful() {
-        String expectedMessage = "User replaced!";
-
-        ResponseEntity<MessageResponse> entity = userController.replace(createReplaceUserRequest());
+        ResponseEntity<Void> entity = userController.replace(createReplaceUserRequest());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("promote Updates User Roles When Successful")
     void promote_UpdatesUserRoles_WhenSuccessful() {
-        String expectedMessage = "User promoted!";
-
-        ResponseEntity<MessageResponse> entity = userController.promote(createPromoteRequest());
+        ResponseEntity<Void> entity = userController.promote(createPromoteRequest());
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
     @Test
     @DisplayName("logout Removes Refresh Token When Successful")
     void logout_RemovesRefreshToken_WhenSuccessful() {
-        String expectedMessage = "Log out successful";
-
-        ResponseEntity<MessageResponse> entity = userController.logout("some-email");
+        ResponseEntity<Void> entity = userController.logout("some-email");
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody().getMessage()).isEqualTo(expectedMessage);
+        assertThat(entity.getBody()).isNull();
     }
 
 }
