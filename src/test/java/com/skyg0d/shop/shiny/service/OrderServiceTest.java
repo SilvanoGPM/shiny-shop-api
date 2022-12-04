@@ -10,6 +10,8 @@ import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.skyg0d.shop.shiny.util.user.UserCreator;
+import com.stripe.model.PaymentLink;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,9 +54,13 @@ public class OrderServiceTest {
     UserService userService;
 
     @Mock
+    StripeService stripeService;
+
+    @Mock
     AuthUtils authUtils;
 
     @BeforeEach
+    @SneakyThrows
     void setUp() {
         PageImpl<Order> ordersPage = new PageImpl<>(List.of(createOrder()));
 
@@ -81,6 +87,19 @@ public class OrderServiceTest {
         BDDMockito
                 .when(orderRepository.findAll(ArgumentMatchers.<Specification<Order>>any(), ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(ordersPage);
+
+        BDDMockito
+                .when(orderRepository.save(ArgumentMatchers.any(Order.class)))
+                .thenReturn(createOrder());
+
+        PaymentLink paymentLink = new PaymentLink();
+
+        paymentLink.setId(STRIPE_PAYMENT_ID);
+        paymentLink.setUrl(STRIPE_PAYMENT_URL);
+
+        BDDMockito
+                .when(stripeService.createPaymentLink(ArgumentMatchers.any(), ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(paymentLink);
 
         BDDMockito
                 .doNothing()
@@ -192,6 +211,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("create Persists Order When Successful")
+    @SneakyThrows
     void create_PersistsOrder_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
@@ -204,6 +224,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("create Persists Order When Product Has Discount")
+    @SneakyThrows
     void create_PersistsOrder_WhenProductHasDiscount() {
         Product product = createProduct();
         product.setDiscount(10);
@@ -266,6 +287,13 @@ public class OrderServiceTest {
     @DisplayName("cancelOrder Updates Order Status When Successful")
     void cancelOrder_UpdatesOrderStatus_WhenSuccessful() {
         assertThatCode(() -> orderService.cancelOrder(UUID.randomUUID().toString()))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("removePaymentLink Updates Order PaymentLink When Successful")
+    void removePaymentLink_UpdatesOrderPaymentLink_WhenSuccessful() {
+        assertThatCode(() -> orderService.removePaymentLink(UUID.randomUUID().toString()))
                 .doesNotThrowAnyException();
     }
 

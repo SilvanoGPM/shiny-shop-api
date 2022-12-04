@@ -13,13 +13,20 @@ import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.repository.UserRepository;
+import com.skyg0d.shop.shiny.service.StripeService;
 import com.skyg0d.shop.shiny.util.JWTCreator;
 import com.skyg0d.shop.shiny.wrapper.PageableResponse;
+import com.stripe.model.PaymentLink;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -41,6 +48,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Integration tests for OrderController")
 public class OrderControllerIT {
 
+    @MockBean
+    StripeService stripeService;
+
     @Autowired
     TestRestTemplate httpClient;
 
@@ -58,6 +68,18 @@ public class OrderControllerIT {
 
     @Autowired
     JWTCreator jwtCreator;
+
+    @BeforeEach
+    @SneakyThrows
+    void setUp() {
+        PaymentLink paymentLink = new PaymentLink();
+        paymentLink.setId("test-payment-id");
+        paymentLink.setUrl("test-payment-url");
+
+        BDDMockito
+                .when(stripeService.createPaymentLink(ArgumentMatchers.any(), ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(paymentLink);
+    }
 
     @Test
     @DisplayName("listAll Returns List Of Orders Inside Page Object When Successful")
@@ -82,6 +104,8 @@ public class OrderControllerIT {
         assertThat(entity.getBody().getContent().get(0)).isNotNull();
 
         assertThat(entity.getBody().getContent().get(0).getId()).isEqualTo(expectedOrder.getId());
+
+        assertThat(entity.getBody().getContent().get(0).getStatus()).isEqualTo(expectedOrder.getStatus());
     }
 
     @Test
@@ -483,7 +507,7 @@ public class OrderControllerIT {
     }
 
     private Order persistOrder() {
-        return persistOrder(EOrderStatus.SHIPPING);
+        return persistOrder(EOrderStatus.WAITING);
     }
 
     private Order persistOrder(EOrderStatus status) {

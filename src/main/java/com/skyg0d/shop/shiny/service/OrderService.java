@@ -144,7 +144,7 @@ public class OrderService {
     public void removePaymentLink(String id) {
         Order orderFound = findById(id);
 
-        orderFound.setProducts(null);
+        orderFound.setPaymentLink(null);
 
         orderRepository.save(orderFound);
     }
@@ -175,9 +175,7 @@ public class OrderService {
                 })
                 .collect(Collectors.toList());
 
-        PaymentLink paymentLink = stripeService.createPaymentLink(productsStripePrices, email, orderId);
-
-        return paymentLink;
+        return stripeService.createPaymentLink(productsStripePrices, email, orderId);
     }
 
     private void updateStatus(Order order, EOrderStatus status) {

@@ -74,7 +74,6 @@ public class StripeService {
         PaymentLinkCreateParams params = PaymentLinkCreateParams
                 .builder()
                 .addAllLineItem(prices)
-                .setCurrency(stripeProps.getCurrency())
                 .setAllowPromotionCodes(true)
                 .setAfterCompletion(afterCompletionParam)
                 .putMetadata("email", email)

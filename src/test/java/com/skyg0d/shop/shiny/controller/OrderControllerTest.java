@@ -10,6 +10,7 @@ import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.OrderService;
 import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.skyg0d.shop.shiny.util.MockUtils;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,7 @@ public class OrderControllerTest {
     AuthUtils authUtils;
 
     @BeforeEach
+    @SneakyThrows
     void setUp() {
         PageImpl<OrderResponse> ordersPage = new PageImpl<>(List.of(createOrderResponse()));
 
@@ -186,6 +188,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("create Persists Order When Successful")
+    @SneakyThrows
     void create_PersistsOrder_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 

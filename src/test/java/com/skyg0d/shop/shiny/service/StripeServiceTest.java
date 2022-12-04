@@ -2,12 +2,10 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.property.StripeProps;
+import com.stripe.model.PaymentLink;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
-import com.stripe.param.PriceCreateParams;
-import com.stripe.param.PriceUpdateParams;
-import com.stripe.param.ProductCreateParams;
-import com.stripe.param.ProductUpdateParams;
+import com.stripe.param.*;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,11 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import static com.skyg0d.shop.shiny.util.product.ProductCreator.*;
-import static com.skyg0d.shop.shiny.util.stripe.StripeCreator.createStripePrice;
-import static com.skyg0d.shop.shiny.util.stripe.StripeCreator.createStripeProduct;
+import static com.skyg0d.shop.shiny.util.stripe.StripeCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -93,6 +91,27 @@ public class StripeServiceTest {
             assertThat(priceFound.getId()).isEqualTo(STRIPE_PRICE_ID);
 
             assertThat(priceFound.getUnitAmountDecimal()).isEqualTo(expectedPrice.getUnitAmountDecimal());
+        }
+    }
+
+    @Test
+    @DisplayName("createPaymentLink Persists Stripe PaymentLink When Successful")
+    @SneakyThrows
+    void createPaymentLink_PersistsStripePaymentLink_WhenSuccessful() {
+        try (MockedStatic<PaymentLink> staticPrice = BDDMockito.mockStatic(PaymentLink.class)) {
+            staticPrice
+                    .when(() -> PaymentLink.create(ArgumentMatchers.any(PaymentLinkCreateParams.class)))
+                    .thenReturn(createPaymentLink());
+
+            PaymentLink expectedPaymentLink = createPaymentLink();
+
+            PaymentLink paymentLinkFound = stripeService.createPaymentLink(new ArrayList<>(), "some-email", "some-order-id");
+
+            assertThat(paymentLinkFound).isNotNull();
+
+            assertThat(paymentLinkFound.getId()).isEqualTo(expectedPaymentLink.getId());
+
+            assertThat(paymentLinkFound.getUrl()).isEqualTo(expectedPaymentLink.getUrl());
         }
     }
 
@@ -172,6 +191,26 @@ public class StripeServiceTest {
                     .thenReturn(priceMock);
 
             assertThatCode(() -> stripeService.desactivePrice(STRIPE_PRICE_ID))
+                    .doesNotThrowAnyException();
+        }
+    }
+
+    @Test
+    @DisplayName("desactivePaymentLink Updates Visibility Of Stripe PaymentLink To False When Successful")
+    @SneakyThrows
+    void desactivePaymentLink_UpdatesVisibilityOfStripePaymentLinkToFalse_WhenSuccessful() {
+        try (MockedStatic<PaymentLink> staticPrice = BDDMockito.mockStatic(PaymentLink.class)) {
+            PaymentLink paymentLinkMock = BDDMockito.mock(PaymentLink.class);
+
+            BDDMockito
+                    .when(paymentLinkMock.update(ArgumentMatchers.any(PaymentLinkUpdateParams.class)))
+                    .thenReturn(createPaymentLink());
+
+            staticPrice
+                    .when(() -> PaymentLink.retrieve(ArgumentMatchers.anyString()))
+                    .thenReturn(paymentLinkMock);
+
+            assertThatCode(() -> stripeService.desactivePaymentLink("some-link"))
                     .doesNotThrowAnyException();
         }
     }
