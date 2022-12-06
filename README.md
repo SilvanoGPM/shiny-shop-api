@@ -80,3 +80,4 @@ app:
 
 - [Implementação JWT](https://github.com/bezkoder/spring-boot-refresh-token-jwt)
 - [Modelo Entidade Relacionamento de um E-commerce](https://netbeans.apache.org/kb/docs/javaee/ecommerce/images/affablebean-erd.png)
+- [Stripe](https://stripe.com)
