@@ -18,4 +18,6 @@ public class CreateOrderProduct {
     @Positive
     private long amount;
 
+    private String extra;
+
 }

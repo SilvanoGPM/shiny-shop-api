@@ -28,4 +28,6 @@ public class OrderResponse {
 
     private String paymentLink;
 
+    private String extra;
+
 }

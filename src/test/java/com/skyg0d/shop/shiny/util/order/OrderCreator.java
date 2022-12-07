@@ -45,7 +45,7 @@ public class OrderCreator {
     public static CreateOrderRequest createCreateOrderRequest() {
         return CreateOrderRequest
                 .builder()
-                .products(List.of(new CreateOrderProduct("test-slug", 10)))
+                .products(List.of(new CreateOrderProduct("test-slug", 10, "")))
                 .build();
     }
 

@@ -20,4 +20,8 @@ public class ProductCalculate {
 
     private long amount;
 
+    private String name;
+
+    private String extra;
+
 }

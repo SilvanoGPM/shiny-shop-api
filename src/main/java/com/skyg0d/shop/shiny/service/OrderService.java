@@ -97,16 +97,28 @@ public class OrderService {
                 .map(ProductCalculate::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        String productsExtra = products
+                .stream()
+                .filter(product -> product.getExtra() != null && !product.getExtra().isBlank())
+                .map((product) ->
+                        String.format("%s - %s", product.getName(), product.getExtra())
+                )
+                .collect(Collectors.joining("\n")) + "\n";
+
+        String extra = productsExtra + request.getExtra();
+
         Order order = Order
                 .builder()
                 .status(EOrderStatus.WAITING)
                 .price(price)
                 .products(productsIds)
                 .user(user)
+                .extra(extra)
                 .build();
 
         Order orderSaved = orderRepository.save(order);
-        PaymentLink paymentLink = createPaymentLink(request, email, orderSaved.getId().toString());
+
+        PaymentLink paymentLink = createPaymentLink(products, email, orderSaved.getId().toString());
 
         orderSaved.setPaymentLink(
                 MyPaymentLink
@@ -159,9 +171,7 @@ public class OrderService {
         updateStatus(orderFound, status);
     }
 
-    private PaymentLink createPaymentLink(CreateOrderRequest request, String email, String orderId) throws StripeException {
-        List<ProductCalculate> products = getProducts(request.getProducts());
-
+    private PaymentLink createPaymentLink(List<ProductCalculate> products, String email, String orderId) throws StripeException {
         List<PaymentLinkCreateParams.LineItem> productsStripePrices = products
                 .stream()
                 .map((rawProduct) -> {
@@ -211,6 +221,8 @@ public class OrderService {
                             .slug(product.getSlug())
                             .id(product.getId())
                             .price(price)
+                            .name(product.getName())
+                            .extra(productRaw.getExtra())
                             .amount(productRaw.getAmount())
                             .build();
                 })

@@ -42,4 +42,6 @@ public class Order extends BaseEntity {
 
     private MyPaymentLink paymentLink;
 
+    private String extra;
+
 }

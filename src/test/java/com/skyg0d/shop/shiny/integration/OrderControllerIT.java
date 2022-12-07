@@ -234,7 +234,7 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
+        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1, "")));
 
         ResponseEntity<OrderResponse> entity = httpClient.exchange(
                 "/orders",
@@ -261,7 +261,7 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
+        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1, "")));
 
         String expectedTitle = "Inactive Product On Order";
 
@@ -288,7 +288,7 @@ public class OrderControllerIT {
 
         CreateOrderRequest request = createCreateOrderRequest();
 
-        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1)));
+        request.setProducts(List.of(new CreateOrderProduct(createOrder().getProducts().get(0).getSlug(), 1, "")));
 
         String expectedTitle = "Product Amount Lacking";
 
