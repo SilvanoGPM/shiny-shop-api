@@ -12,14 +12,6 @@
 * Docker e docker-compose.
 * Java 11 ou superior.
 * Maven(opcional pois no projeto já vem um binário do mesmo).
-### :athletic_shoe: Steps:
-
-1. Clone este repositório para sua máquina e abra o terminal já no diretório do projeto. 
-2. Utilize o comando `docker-compose up`, para iniciar o container do MySQL.
-3. Utilize o comando `./mvnw clean package` para gerar um *.jar* do projeto.
-4. Utilize o comando `./mvnw spring-boot:run` para iniciar o servidor.
-
-Pronto, caso tudo tenha ocorrido com sucesso, o projeto funcionará normalmente!
 
 ### :gear: Configuração padrão:
 
@@ -64,6 +56,17 @@ app:
     secretKey: YOUR_STRIPE_PRIVATE_KEY
     webhookSecret: YOUR_STRIPE_WEBHOOK_SECRET
 ```
+
+### :athletic_shoe: Passo a passo:
+
+1. Clone este repositório para sua máquina e abra o terminal já no diretório do projeto. 
+2. Utilize o comando `docker-compose up`, para iniciar o container do MySQL.
+3. Utilize o comando `./mvnw clean package` para gerar um *.jar* do projeto.
+4. Utilize o comando `./mvnw spring-boot:run` para iniciar o servidor.
+5. Baixe e instale a [CLI do Stripe](https://stripe.com/docs/stripe-cli?locale=pt-BR).
+6. Utilize o comando `stripe listen --forward-to localhost:<PORT>/api/v1/stripe/webhook` para iniciar a escuta dos eventos do Stripe.
+
+Pronto, caso tudo tenha ocorrido com sucesso, o projeto funcionará normalmente!
 
 ## :rocket: Tecnologias
 
