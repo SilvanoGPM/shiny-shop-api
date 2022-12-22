@@ -7,7 +7,7 @@
 
 ## :wrench: Utilizando localmente
 
-### :mag_right: Como executar?
+### :mag_right: Requisitos:
 
 * Docker e docker-compose.
 * Java 11 ou superior.
