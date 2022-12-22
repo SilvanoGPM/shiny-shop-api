@@ -14,6 +14,7 @@ import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.ProductRepository;
 import com.skyg0d.shop.shiny.service.StripeService;
 import com.skyg0d.shop.shiny.util.JWTCreator;
+import com.skyg0d.shop.shiny.util.product.ProductCreator;
 import com.skyg0d.shop.shiny.wrapper.PageableResponse;
 import com.stripe.model.Price;
 import lombok.SneakyThrows;
@@ -77,6 +78,15 @@ public class ProductControllerIT {
         BDDMockito
                 .when(stripeService.createPrice(ArgumentMatchers.any(), ArgumentMatchers.any()))
                 .thenReturn(stripePrice);
+
+        BDDMockito
+                .when(stripeService.createPromotionCode(ArgumentMatchers.any(), ArgumentMatchers.anyString()))
+                .thenReturn(ProductCreator.createPromotionCodeCreated());
+
+        BDDMockito
+                .doNothing()
+                .when(stripeService)
+                .deletePromotionCode(ArgumentMatchers.anyString(), ArgumentMatchers.anyString());
     }
 
     @Test
@@ -334,10 +344,12 @@ public class ProductControllerIT {
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
         Product productSaved = productRepository.save(createProductToBeSave());
 
+        ApplyDiscountRequest request = createApplyDiscountRequest();
+
         ResponseEntity<Void> entity = httpClient.exchange(
                 "/products/{slug}/apply/discount",
                 HttpMethod.PATCH,
-                jwtCreator.createAdminAuthEntity(new ApplyDiscountRequest(10)),
+                jwtCreator.createAdminAuthEntity(request),
                 Void.class,
                 productSaved.getSlug()
         );
@@ -354,7 +366,40 @@ public class ProductControllerIT {
 
         assertThat(productFound.get()).isNotNull();
 
-        assertThat(productFound.get().getDiscount()).isEqualTo(10);
+        assertThat(productFound.get().getDiscount()).isEqualTo(request.getDiscount());
+
+        assertThat(productFound.get().getDiscountCode()).isEqualTo(request.getCode());
+    }
+
+    @Test
+    @DisplayName("removeDiscount Removes Discount To Product When Successful")
+    @SneakyThrows
+    void removeDiscount_RemovesDiscountToProduct_WhenSuccessful() {
+        Product productSaved = productRepository.save(createProductToBeSave());
+
+        ResponseEntity<Void> entity = httpClient.exchange(
+                "/products/{slug}/remove/discount",
+                HttpMethod.PATCH,
+                jwtCreator.createAdminAuthEntity(null),
+                Void.class,
+                productSaved.getSlug()
+        );
+
+        Optional<Product> productFound = productRepository.findBySlug(productSaved.getSlug());
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        assertThat(entity.getBody()).isNull();
+
+        assertThat(productFound).isNotEmpty();
+
+        assertThat(productFound.get()).isNotNull();
+
+        assertThat(productFound.get().getDiscount()).isEqualTo(0);
+
+        assertThat(productFound.get().getDiscountCode()).isEqualTo(null);
     }
 
     @Test

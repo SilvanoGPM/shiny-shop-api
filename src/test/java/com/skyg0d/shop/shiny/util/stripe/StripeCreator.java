@@ -2,17 +2,16 @@ package com.skyg0d.shop.shiny.util.stripe;
 
 import com.skyg0d.shop.shiny.util.order.OrderCreator;
 import com.skyg0d.shop.shiny.util.product.ProductCreator;
-import com.stripe.model.PaymentLink;
-import com.stripe.model.Price;
-import com.stripe.model.Product;
-import org.springframework.security.core.parameters.P;
+import com.stripe.model.*;
 
 import java.math.BigDecimal;
 
 public class StripeCreator {
 
+    public static final String COUPON_NAME = "Coupon Test";
+
     public static Product createStripeProduct() {
-        Product stripeProduct =  new Product();
+        Product stripeProduct = new Product();
 
         stripeProduct.setId(ProductCreator.STRIPE_PRODUCT_ID);
         stripeProduct.setName(ProductCreator.NAME);
@@ -37,6 +36,24 @@ public class StripeCreator {
         paymentLink.setUrl(OrderCreator.STRIPE_PAYMENT_URL);
 
         return paymentLink;
+    }
+
+    public static Coupon createCoupon() {
+        Coupon coupon = new Coupon();
+
+        coupon.setId(ProductCreator.STRIPE_COUPON_ID);
+        coupon.setName(COUPON_NAME);
+
+        return coupon;
+    }
+
+    public static PromotionCode createPromotionCode() {
+        PromotionCode promotionCode = new PromotionCode();
+
+        promotionCode.setId(ProductCreator.STRIPE_PROMOTION_CODE_ID);
+        promotionCode.setCode(ProductCreator.DISCOUNT_CODE);
+
+        return promotionCode;
     }
 
 }

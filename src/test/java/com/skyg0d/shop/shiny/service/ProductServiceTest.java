@@ -4,6 +4,7 @@ import com.skyg0d.shop.shiny.exception.ProductCategoryNotFoundException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
@@ -111,6 +112,15 @@ public class ProductServiceTest {
         BDDMockito
                 .when(stripeService.retrieveProduct(ArgumentMatchers.anyString()))
                 .thenReturn(stripeProductMock);
+
+        BDDMockito
+                .when(stripeService.createPromotionCode(ArgumentMatchers.any(ApplyDiscountParams.class), ArgumentMatchers.anyString()))
+                .thenReturn(createPromotionCodeCreated());
+
+        BDDMockito
+                .doNothing()
+                .when(stripeService)
+                .deletePromotionCode(ArgumentMatchers.anyString(), ArgumentMatchers.anyString());
 
         BDDMockito
                 .when(productRepository.save(ArgumentMatchers.any(Product.class)))
@@ -274,7 +284,14 @@ public class ProductServiceTest {
     @Test
     @DisplayName("applyDiscount Applies Discount To Product When Successful")
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
-        assertThatCode(() -> productService.applyDiscount("test-slug", 10))
+        assertThatCode(() -> productService.applyDiscount(createApplyDiscountParams()))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("removeDiscount Removes Discount To Product When Successful")
+    void removeDiscount_RemovesDiscountToProduct_WhenSuccessful() {
+        assertThatCode(() -> productService.removeDiscount(SLUG))
                 .doesNotThrowAnyException();
     }
 

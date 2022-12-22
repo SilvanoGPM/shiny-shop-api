@@ -1,10 +1,10 @@
 package com.skyg0d.shop.shiny.service;
 
+import com.skyg0d.shop.shiny.payload.PromotionCodeCreated;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.property.StripeProps;
-import com.stripe.model.PaymentLink;
-import com.stripe.model.Price;
-import com.stripe.model.Product;
+import com.skyg0d.shop.shiny.util.product.ProductCreator;
+import com.stripe.model.*;
 import com.stripe.param.*;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -112,6 +112,36 @@ public class StripeServiceTest {
             assertThat(paymentLinkFound.getId()).isEqualTo(expectedPaymentLink.getId());
 
             assertThat(paymentLinkFound.getUrl()).isEqualTo(expectedPaymentLink.getUrl());
+        }
+    }
+
+    @Test
+    @DisplayName("createPromotionCode Persists Stripe Promotion Code When Successful")
+    @SneakyThrows
+    void createPromotionCode_PersistsStripePromotionCode_WhenSuccessful() {
+        try (MockedStatic<Coupon> staticCoupon = BDDMockito.mockStatic(Coupon.class)) {
+            try (MockedStatic<PromotionCode> staticPromotionCode = BDDMockito.mockStatic(PromotionCode.class)) {
+
+                staticCoupon
+                        .when(() -> Coupon.create(ArgumentMatchers.any(CouponCreateParams.class)))
+                        .thenReturn(createCoupon());
+
+                staticPromotionCode
+                        .when(() -> PromotionCode.create(ArgumentMatchers.any(PromotionCodeCreateParams.class)))
+                        .thenReturn(createPromotionCode());
+
+                Coupon expectedCoupon = createCoupon();
+
+                PromotionCode expectedPromotionCode = createPromotionCode();
+
+                PromotionCodeCreated promotionCodeCreated = stripeService.createPromotionCode(ProductCreator.createApplyDiscountParams(), STRIPE_PRODUCT_ID);
+
+                assertThat(promotionCodeCreated).isNotNull();
+
+                assertThat(promotionCodeCreated.getCouponId()).isEqualTo(expectedCoupon.getId());
+
+                assertThat(promotionCodeCreated.getPromotionCodeId()).isEqualTo(expectedPromotionCode.getId());
+            }
         }
     }
 
@@ -232,6 +262,38 @@ public class StripeServiceTest {
 
             assertThatCode(() -> stripeService.deleteProduct(STRIPE_PRODUCT_ID))
                     .doesNotThrowAnyException();
+        }
+    }
+
+    @Test
+    @DisplayName("deletePromotionCode Removes Stripe PromotionCode When Successful")
+    @SneakyThrows
+    void deletePromotionCode_RemovesStripePromotionCode_WhenSuccessful() {
+        try (MockedStatic<Coupon> staticCoupon = BDDMockito.mockStatic(Coupon.class)) {
+            try (MockedStatic<PromotionCode> staticPromotionCode = BDDMockito.mockStatic(PromotionCode.class)) {
+                Coupon couponMock = BDDMockito.mock(Coupon.class);
+
+                BDDMockito
+                        .when(couponMock.delete())
+                        .thenReturn(createCoupon());
+
+                staticCoupon
+                        .when(() -> Coupon.retrieve(ArgumentMatchers.anyString()))
+                        .thenReturn(couponMock);
+
+                PromotionCode promotionCodeMock = BDDMockito.mock(PromotionCode.class);
+
+                BDDMockito
+                        .when(promotionCodeMock.update(ArgumentMatchers.any(PromotionCodeUpdateParams.class)))
+                        .thenReturn(createPromotionCode());
+
+                staticPromotionCode
+                        .when(() -> PromotionCode.retrieve(ArgumentMatchers.anyString()))
+                        .thenReturn(promotionCodeMock);
+
+                assertThatCode(() -> stripeService.deletePromotionCode(STRIPE_PROMOTION_CODE_ID, STRIPE_COUPON_ID))
+                        .doesNotThrowAnyException();
+            }
         }
     }
 

@@ -2,7 +2,7 @@ package com.skyg0d.shop.shiny.controller;
 
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.model.Product;
-import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
 import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
@@ -81,7 +81,7 @@ public class ProductControllerTest {
         BDDMockito
                 .doNothing()
                 .when(productService)
-                .applyDiscount(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt());
+                .applyDiscount(ArgumentMatchers.any(ApplyDiscountParams.class));
 
         BDDMockito
                 .doNothing()
@@ -261,7 +261,20 @@ public class ProductControllerTest {
     @DisplayName("applyDiscount Applies Discount To Product When Successful")
     @SneakyThrows
     void applyDiscount_AppliesDiscountToProduct_WhenSuccessful() {
-        ResponseEntity<Void> entity = productController.applyDiscount("test-slug", new ApplyDiscountRequest(10));
+        ResponseEntity<Void> entity = productController.applyDiscount(SLUG, createApplyDiscountRequest());
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        assertThat(entity.getBody()).isNull();
+    }
+
+    @Test
+    @DisplayName("removeDiscount Removes Discount To Product When Successful")
+    @SneakyThrows
+    void removeDiscount_RemovesDiscountToProduct_WhenSuccessful() {
+        ResponseEntity<Void> entity = productController.removeDiscount(SLUG);
 
         assertThat(entity).isNotNull();
 

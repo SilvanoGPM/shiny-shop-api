@@ -2,6 +2,9 @@ package com.skyg0d.shop.shiny.util.product;
 
 import com.skyg0d.shop.shiny.mapper.ProductMapper;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
+import com.skyg0d.shop.shiny.payload.PromotionCodeCreated;
+import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
@@ -23,9 +26,17 @@ public class ProductCreator {
     public static final BigDecimal PRICE = BigDecimal.valueOf(10);
     public static final long AMOUNT = 10;
 
+    public static final int DISCOUNT = 10;
+
+    public static final String DISCOUNT_CODE = "TESTDISCOUNT";
+
     public static final String STRIPE_PRODUCT_ID = "test-stripe-product-id";
 
     public static final String STRIPE_PRICE_ID = "test-stripe-price-id";
+
+    public static final String STRIPE_PROMOTION_CODE_ID = "test-stripe-promotion-code-id";
+
+    public static final String STRIPE_COUPON_ID = "test-stripe-coupon-id";
 
     public static final List<String> IMAGES = List.of("test-product-image");
     public static final List<String> SIZES = List.of("Test Product Size");
@@ -117,6 +128,27 @@ public class ProductCreator {
                 .name(NAME)
                 .lessThanOrEqualToPrice(new BigDecimal(-1))
                 .greaterThanOrEqualToPrice(new BigDecimal(-1))
+                .build();
+    }
+
+    public static ApplyDiscountRequest createApplyDiscountRequest() {
+        return ApplyDiscountRequest
+                .builder()
+                .name("test-discount")
+                .discount(DISCOUNT)
+                .code(DISCOUNT_CODE)
+                .build();
+    }
+
+    public static ApplyDiscountParams createApplyDiscountParams() {
+        return ApplyDiscountParams.fromRequest(createApplyDiscountRequest(), SLUG);
+    }
+
+    public static PromotionCodeCreated createPromotionCodeCreated() {
+        return PromotionCodeCreated
+                .builder()
+                .promotionCodeId(STRIPE_PROMOTION_CODE_ID)
+                .couponId(STRIPE_COUPON_ID)
                 .build();
     }
 

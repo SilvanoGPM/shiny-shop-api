@@ -16,6 +16,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentLink;
 import com.stripe.param.PaymentLinkCreateParams;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -100,12 +101,10 @@ public class OrderService {
         String productsExtra = products
                 .stream()
                 .filter(product -> product.getExtra() != null && !product.getExtra().isBlank())
-                .map((product) ->
-                        String.format("%s - %s", product.getName(), product.getExtra())
-                )
-                .collect(Collectors.joining("\n")) + "\n";
+                .map((product) -> String.format("%s - %s", product.getName(), product.getExtra()))
+                .collect(Collectors.joining("\n"));
 
-        String extra = productsExtra + request.getExtra();
+        String extra = StringUtils.isBlank(productsExtra) ? "" : productsExtra + request.getExtra();
 
         Order order = Order
                 .builder()
