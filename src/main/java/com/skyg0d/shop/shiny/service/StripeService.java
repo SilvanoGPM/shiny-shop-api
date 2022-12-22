@@ -1,13 +1,13 @@
 package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.model.Category;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
+import com.skyg0d.shop.shiny.payload.PromotionCodeCreated;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.property.StripeProps;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentLink;
-import com.stripe.model.Price;
-import com.stripe.model.Product;
+import com.stripe.model.*;
 import com.stripe.param.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +83,37 @@ public class StripeService {
         return PaymentLink.create(params);
     }
 
+    public PromotionCodeCreated createPromotionCode(ApplyDiscountParams params, String productId) throws StripeException {
+        CouponCreateParams couponParams = CouponCreateParams
+                .builder()
+                .setName(params.getName())
+                .setPercentOff(new BigDecimal(params.getDiscount()))
+                .setDuration(CouponCreateParams.Duration.FOREVER)
+                .setAppliesTo(
+                        CouponCreateParams.AppliesTo
+                                .builder()
+                                .addProduct(productId)
+                                .build()
+                )
+                .build();
+
+        Coupon coupon = Coupon.create(couponParams);
+
+        PromotionCodeCreateParams codeParams = PromotionCodeCreateParams
+                .builder()
+                .setCoupon(coupon.getId())
+                .setCode(params.getCode())
+                .build();
+
+        PromotionCode promotionCode = PromotionCode.create(codeParams);
+
+        return PromotionCodeCreated
+                .builder()
+                .promotionCodeId(promotionCode.getId())
+                .couponId(coupon.getId())
+                .build();
+    }
+
     public void updateProduct(String productId, ProductUpdateParams params) throws StripeException {
         retrieveProduct(productId).update(params);
     }
@@ -115,6 +146,15 @@ public class StripeService {
 
     public void deleteProduct(String productId) throws StripeException {
         retrieveProduct(productId).delete();
+    }
+
+    public void deletePromotionCode(String promotionCodeId, String couponId) throws StripeException {
+        Coupon.retrieve(couponId).delete();
+
+        PromotionCode.retrieve(promotionCodeId).update(PromotionCodeUpdateParams
+                .builder()
+                .setActive(false)
+                .build());
     }
 
 }

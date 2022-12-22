@@ -3,7 +3,7 @@ package com.skyg0d.shop.shiny.payload.request;
 import lombok.*;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 
 @Getter
 @Setter
@@ -12,7 +12,10 @@ import javax.validation.constraints.PositiveOrZero;
 @Builder
 public class ApplyDiscountRequest {
 
-    @PositiveOrZero
+    private String name;
+    private String code;
+
+    @Positive
     @Max(100)
     private int discount;
 

@@ -6,6 +6,8 @@ import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
 import com.skyg0d.shop.shiny.mapper.ProductMapper;
 import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.model.Product;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
+import com.skyg0d.shop.shiny.payload.PromotionCodeCreated;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
@@ -116,7 +118,6 @@ public class ProductService {
     }
 
     public void toggleActive(String slug) throws StripeException {
-
         Product productFound = findBySlug(slug);
 
         boolean isActive = !productFound.isActive();
@@ -126,10 +127,30 @@ public class ProductService {
         productRepository.save(productFound);
     }
 
-    public void applyDiscount(String slug, int discount) {
-        Product productFound = findBySlug(slug);
+    @Transactional
+    public void applyDiscount(ApplyDiscountParams params) throws StripeException {
+        Product productFound = findBySlug(params.getProductSlug());
 
-        productFound.setDiscount(discount);
+        PromotionCodeCreated promotionCode = stripeService.createPromotionCode(params, productFound.getStripeProductId());
+
+        productFound.setDiscount(params.getDiscount());
+        productFound.setDiscountCode(params.getCode());
+        productFound.setStripePromotionCodeId(promotionCode.getPromotionCodeId());
+        productFound.setStripeCouponId(promotionCode.getCouponId());
+
+        productRepository.save(productFound);
+    }
+
+    @Transactional
+    public void removeDiscount(String productSlug) throws StripeException {
+        Product productFound = findBySlug(productSlug);
+
+        stripeService.deletePromotionCode(productFound.getStripePromotionCodeId(), productFound.getStripeCouponId());
+
+        productFound.setStripeCouponId(null);
+        productFound.setStripePromotionCodeId(null);
+        productFound.setDiscountCode(null);
+        productFound.setDiscount(0);
 
         productRepository.save(productFound);
     }

@@ -2,7 +2,6 @@ package com.skyg0d.shop.shiny.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -10,7 +9,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,6 +45,10 @@ public class Product extends BaseEntity {
 
     private String stripePriceId;
 
+    private String stripePromotionCodeId;
+
+    private String stripeCouponId;
+
     @Positive
     private BigDecimal price;
 
@@ -53,6 +59,8 @@ public class Product extends BaseEntity {
     @Max(100)
     @Builder.Default
     private int discount = 0;
+
+    private String discountCode;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

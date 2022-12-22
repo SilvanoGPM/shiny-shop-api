@@ -37,6 +37,8 @@ public class UserProductResponse {
 
     private Integer discount;
 
+    private String discountCode;
+
     private Set<CategoryResponse> categories = new HashSet<>();
 
     private List<String> images = new ArrayList<>();

@@ -3,12 +3,12 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.annotations.IsAdmin;
 import com.skyg0d.shop.shiny.annotations.IsStaff;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
+import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
 import com.skyg0d.shop.shiny.payload.request.ApplyDiscountRequest;
 import com.skyg0d.shop.shiny.payload.request.ChangeAmountRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceProductRequest;
 import com.skyg0d.shop.shiny.payload.response.AdminProductResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserProductResponse;
 import com.skyg0d.shop.shiny.payload.search.ProductParametersSearch;
 import com.skyg0d.shop.shiny.service.ProductService;
@@ -138,7 +138,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{slug}/apply/discount")
-    @IsStaff
+    @IsAdmin
     @Operation(summary = "Apply discount to product", tags = "Products")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Successful"),
@@ -146,8 +146,23 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "When forbidden"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
-    public ResponseEntity<Void> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) {
-        productService.applyDiscount(slug, request.getDiscount());
+    public ResponseEntity<Void> applyDiscount(@PathVariable String slug, @Valid @RequestBody ApplyDiscountRequest request) throws StripeException {
+        productService.applyDiscount(ApplyDiscountParams.fromRequest(request, slug));
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/{slug}/remove/discount")
+    @IsAdmin
+    @Operation(summary = "Remove discount of product", tags = "Products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<Void> removeDiscount(@PathVariable String slug) throws StripeException {
+        productService.removeDiscount(slug);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

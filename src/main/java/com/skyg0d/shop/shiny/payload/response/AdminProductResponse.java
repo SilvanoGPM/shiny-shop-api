@@ -37,9 +37,15 @@ public class AdminProductResponse {
 
     private int discount;
 
+    private String discountCode;
+
     private String stripeProductId;
 
     private String stripePriceId;
+
+    private String stripePromotionCodeId;
+
+    private String stripeCouponId;
 
     private Set<CategoryResponse> categories = new HashSet<>();
 
