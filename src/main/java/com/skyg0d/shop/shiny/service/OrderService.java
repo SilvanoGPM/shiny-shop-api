@@ -4,6 +4,7 @@ import com.skyg0d.shop.shiny.exception.*;
 import com.skyg0d.shop.shiny.mapper.OrderMapper;
 import com.skyg0d.shop.shiny.model.*;
 import com.skyg0d.shop.shiny.payload.ProductCalculate;
+import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
@@ -11,6 +12,7 @@ import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.repository.specification.OrderSpecification;
 import com.skyg0d.shop.shiny.util.AuthUtils;
+import com.skyg0d.shop.shiny.util.StatusUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentLink;
 import com.stripe.param.PaymentLinkCreateParams;
@@ -40,7 +42,11 @@ public class OrderService {
 
     private final AuthUtils authUtils;
 
+    private final StatusUtils statusUtils;
+
     private final StripeService stripeService;
+
+    private final NotificationService notificationService;
 
     private final OrderMapper mapper = OrderMapper.INSTANCE;
 
@@ -126,9 +132,14 @@ public class OrderService {
                         .build()
         );
 
-        return mapper.toOrderResponse(orderRepository.save(orderSaved));
+        OrderResponse orderResponse = mapper.toOrderResponse(orderRepository.save(orderSaved));
+
+        sendNotification(statusUtils.getStatusNotificationMessage(EOrderStatus.WAITING), user.getEmail());
+
+        return orderResponse;
     }
 
+    @Transactional
     public void cancelOrder(String id) throws OrderStatusException {
         Order orderFound = findById(id);
 
@@ -142,9 +153,10 @@ public class OrderService {
             throw new PermissionInsufficient("order");
         }
 
-        updateStatus(orderFound, EOrderStatus.CANCELED);
+        updateStatus(orderFound, EOrderStatus.CANCELED, statusUtils.getStatusNotificationMessage(EOrderStatus.CANCELED));
     }
 
+    @Transactional
     public void removePaymentLink(String id) {
         Order orderFound = findById(id);
 
@@ -153,6 +165,7 @@ public class OrderService {
         orderRepository.save(orderFound);
     }
 
+    @Transactional
     public void adminChangeStatus(String id, EOrderStatus status, String errMessage) {
         Order orderFound = findById(id);
 
@@ -160,7 +173,7 @@ public class OrderService {
             throw new OrderStatusException(errMessage);
         }
 
-        updateStatus(orderFound, status);
+        updateStatus(orderFound, status, statusUtils.getStatusNotificationMessage(status));
     }
 
     private PaymentLink createPaymentLink(List<ProductCalculate> products, String email, String orderId) throws StripeException {
@@ -180,10 +193,12 @@ public class OrderService {
         return stripeService.createPaymentLink(productsStripePrices, email, orderId);
     }
 
-    private void updateStatus(Order order, EOrderStatus status) {
+    private void updateStatus(Order order, EOrderStatus status, String notificationContent) {
         order.setStatus(status);
 
         orderRepository.save(order);
+
+        sendNotification(notificationContent, order.getUser().getEmail());
     }
 
     private List<ProductCalculate> getProducts(List<CreateOrderProduct> products) throws InactiveProductOnOrderException, ProductOverflowAmountException {
@@ -232,4 +247,16 @@ public class OrderService {
             throw new ProductOverflowAmountException(product.getSlug(), product.getAmount());
         }
     }
+
+    private void sendNotification(String content, String email) {
+        CreateNotificationRequest notificationRequest = CreateNotificationRequest
+                .builder()
+                .content(content)
+                .category("order")
+                .userEmail(email)
+                .build();
+
+        notificationService.create(notificationRequest);
+    }
+
 }

@@ -257,7 +257,7 @@ public class OrderControllerIT {
     @Test
     @DisplayName("create Returns ExceptionDetails When Order Has Invalid Product")
     void create_ReturnsExceptionDetails_WhenOrderHasInvalidProduct() {
-        persistOrder(EOrderStatus.SHIPPING, 10, false);
+        persistOrder(EOrderStatus.WAITING, 10, false);
 
         CreateOrderRequest request = createCreateOrderRequest();
 
@@ -284,7 +284,7 @@ public class OrderControllerIT {
     @Test
     @DisplayName("create Returns ExceptionDetails When Order Product No Stock")
     void create_ReturnsExceptionDetails_WhenOrderProductNoStock() {
-        persistOrder(EOrderStatus.SHIPPING, 0);
+        persistOrder(EOrderStatus.WAITING, 0);
 
         CreateOrderRequest request = createCreateOrderRequest();
 
