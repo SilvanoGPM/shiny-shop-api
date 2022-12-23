@@ -16,14 +16,14 @@ public class OrderSpecification extends AbstractSpecification {
         return where(withGreaterThanOrEqualToPrice(search.getGreaterThanOrEqualToPrice()))
                 .and(where(withLessThanOrEqualToPrice(search.getLessThanOrEqualToPrice())))
                 .and(where(withCreatedInDateOrAfter(search.getCreatedInDateOrAfter())))
+                .and(where(withCreatedInDateOrBefore(search.getCreatedInDateOrBefore())))
                 .and(where(withProductName(search.getProductName())))
                 .and(where(withProductDescription(search.getProductDescription())))
                 .and(where(withProductBrand(search.getProductBrand())))
                 .and(where(withUserUsername(search.getUserUsername())))
                 .and(where(withUserFullName(search.getUserFullName())))
                 .and(where(withUserEmail(search.getUserEmail())))
-                .and(where(withStatus(search.getStatus())))
-                .and(where(withCreatedInDateOrBefore(search.getCreatedInDateOrBefore())));
+                .and(where(withStatus(search.getStatus())));
     }
 
     private static Specification<Order> withGreaterThanOrEqualToPrice(BigDecimal price) {

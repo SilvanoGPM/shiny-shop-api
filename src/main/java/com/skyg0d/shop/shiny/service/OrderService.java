@@ -10,7 +10,6 @@ import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.repository.specification.OrderSpecification;
-import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.AuthUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentLink;
@@ -137,16 +136,10 @@ public class OrderService {
             throw new OrderStatusException("Order already delivered, could not cancel.");
         }
 
-        UserDetailsImpl userDetails = authUtils.getUserDetails();
+        boolean isOwnerOrAdmin = authUtils.isOwnerOrAdmin(orderFound.getUser().getEmail());
 
-        boolean isOwner = userDetails.getEmail().equals(orderFound.getUser().getEmail());
-
-        boolean isAdmin = userDetails.getAuthorities().stream().anyMatch((authority) ->
-                authority.getAuthority().equals("ROLE_ADMIN")
-        );
-
-        if (!isOwner && !isAdmin) {
-            throw new OrderPermissionInsufficient();
+        if (!isOwnerOrAdmin) {
+            throw new PermissionInsufficient("order");
         }
 
         updateStatus(orderFound, EOrderStatus.CANCELED);

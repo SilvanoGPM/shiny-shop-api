@@ -318,7 +318,7 @@ public class OrderServiceTest {
                 .when(authUtils.getUserDetails())
                 .thenReturn(new UserDetailsImpl(UUID.randomUUID(), UserCreator.USERNAME, "random-email", UserCreator.PASSWORD, new ArrayList<>()));
 
-        assertThatExceptionOfType(OrderPermissionInsufficient.class)
+        assertThatExceptionOfType(PermissionInsufficient.class)
                 .isThrownBy(() -> orderService.cancelOrder(UUID.randomUUID().toString()));
     }
 

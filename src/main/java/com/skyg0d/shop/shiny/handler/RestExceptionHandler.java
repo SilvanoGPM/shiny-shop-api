@@ -83,11 +83,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Order Status Incorrect");
     }
 
-    @ExceptionHandler(OrderPermissionInsufficient.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionDetails handleOrderPermissionInsufficient(OrderPermissionInsufficient ex) {
+    @ExceptionHandler(PermissionInsufficient.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionDetails handleOrderPermissionInsufficient(PermissionInsufficient ex) {
         return ExceptionDetails
-                .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Order Permission Insufficient");
+                .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Permission Insufficient");
     }
 
     @ExceptionHandler(BadCredentialsException.class)

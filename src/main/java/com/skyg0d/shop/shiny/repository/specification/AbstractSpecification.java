@@ -16,18 +16,26 @@ public abstract class AbstractSpecification {
     }
 
     protected static <T> Specification<T> withCreatedInDateOrAfter(String createdInDateOrAfter) {
-        return getSpec(createdInDateOrAfter, (root, query, builder) -> (
-                builder.greaterThanOrEqualTo(root.get("createdAt"), LocalDateTime.of(
-                        LocalDate.parse(createdInDateOrAfter),
+        return inDateOrAfter(createdInDateOrAfter, "createdAt");
+    }
+
+    protected static <T> Specification<T> withCreatedInDateOrBefore(String createdInDateOrBefore) {
+        return inDateOrBefore(createdInDateOrBefore, "createdAt");
+    }
+
+    protected static <T> Specification<T> inDateOrAfter(String date, String property) {
+        return getSpec(date, (root, query, builder) -> (
+                builder.greaterThanOrEqualTo(root.get(property), LocalDateTime.of(
+                        LocalDate.parse(date),
                         LocalTime.MIN
                 ))
         ));
     }
 
-    protected static <T> Specification<T> withCreatedInDateOrBefore(String createdInDateOrBefore) {
-        return getSpec(createdInDateOrBefore, (root, query, builder) -> (
-                builder.lessThanOrEqualTo(root.get("createdAt"), LocalDateTime.of(
-                        LocalDate.parse(createdInDateOrBefore),
+    protected static <T> Specification<T> inDateOrBefore(String date, String property) {
+        return getSpec(date, (root, query, builder) -> (
+                builder.lessThanOrEqualTo(root.get(property), LocalDateTime.of(
+                        LocalDate.parse(date),
                         LocalTime.MAX
                 ))
         ));
