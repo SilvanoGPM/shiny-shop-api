@@ -12,7 +12,6 @@ import com.skyg0d.shop.shiny.payload.search.OrderParameterSearch;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.repository.specification.OrderSpecification;
 import com.skyg0d.shop.shiny.util.AuthUtils;
-import com.skyg0d.shop.shiny.util.StatusUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentLink;
 import com.stripe.param.PaymentLinkCreateParams;
@@ -41,8 +40,6 @@ public class OrderService {
     private final UserService userService;
 
     private final AuthUtils authUtils;
-
-    private final StatusUtils statusUtils;
 
     private final StripeService stripeService;
 
@@ -134,7 +131,7 @@ public class OrderService {
 
         OrderResponse orderResponse = mapper.toOrderResponse(orderRepository.save(orderSaved));
 
-        sendNotification(statusUtils.getStatusNotificationMessage(EOrderStatus.WAITING), user.getEmail());
+        sendNotification(EOrderStatus.WAITING.getNotificationMessage(), user.getEmail());
 
         return orderResponse;
     }
@@ -153,7 +150,7 @@ public class OrderService {
             throw new PermissionInsufficient("order");
         }
 
-        updateStatus(orderFound, EOrderStatus.CANCELED, statusUtils.getStatusNotificationMessage(EOrderStatus.CANCELED));
+        updateStatus(orderFound, EOrderStatus.CANCELED);
     }
 
     @Transactional
@@ -173,7 +170,7 @@ public class OrderService {
             throw new OrderStatusException(errMessage);
         }
 
-        updateStatus(orderFound, status, statusUtils.getStatusNotificationMessage(status));
+        updateStatus(orderFound, status);
     }
 
     private PaymentLink createPaymentLink(List<ProductCalculate> products, String email, String orderId) throws StripeException {
@@ -193,12 +190,12 @@ public class OrderService {
         return stripeService.createPaymentLink(productsStripePrices, email, orderId);
     }
 
-    private void updateStatus(Order order, EOrderStatus status, String notificationContent) {
+    private void updateStatus(Order order, EOrderStatus status) {
         order.setStatus(status);
 
         orderRepository.save(order);
 
-        sendNotification(notificationContent, order.getUser().getEmail());
+        sendNotification(status.getNotificationMessage(), order.getUser().getEmail());
     }
 
     private List<ProductCalculate> getProducts(List<CreateOrderProduct> products) throws InactiveProductOnOrderException, ProductOverflowAmountException {
