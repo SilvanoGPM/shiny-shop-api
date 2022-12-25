@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.annotations.IsStaff;
 import com.skyg0d.shop.shiny.annotations.IsUser;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
+import com.skyg0d.shop.shiny.payload.request.CreateNotificationToAllRequest;
 import com.skyg0d.shop.shiny.payload.response.CountNotificationsResponse;
 import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.payload.search.NotificationParameterSearch;
@@ -70,6 +71,14 @@ public class NotificationController {
     @IsStaff
     public ResponseEntity<NotificationResponse> create(@RequestBody @Valid CreateNotificationRequest request) {
         return new ResponseEntity<>(notificationService.create(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/all")
+    @IsStaff
+    public ResponseEntity<Void> createToAll(@RequestBody @Valid CreateNotificationToAllRequest request) {
+        notificationService.createToAllUsers(request);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/read")

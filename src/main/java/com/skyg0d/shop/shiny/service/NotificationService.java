@@ -5,7 +5,9 @@ import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.mapper.NotificationMapper;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.payload.CreateNotificationParams;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
+import com.skyg0d.shop.shiny.payload.request.CreateNotificationToAllRequest;
 import com.skyg0d.shop.shiny.payload.response.CountNotificationsResponse;
 import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.payload.search.NotificationParameterSearch;
@@ -68,11 +70,13 @@ public class NotificationService {
     public NotificationResponse create(CreateNotificationRequest request) {
         User user = userService.findByEmail(request.getUserEmail());
 
-        Notification notification = mapper.toNotification(request);
+        return create(CreateNotificationParams.fromRequest(request, user));
+    }
 
-        notification.setUser(user);
-
-        return mapper.toNotificationResponse(notificationRepository.save(notification));
+    public void createToAllUsers(CreateNotificationToAllRequest request) {
+        userService.listAll().forEach((user) ->
+                create(CreateNotificationParams.fromRequest(request, user))
+        );
     }
 
     public void read(String id) {
@@ -115,6 +119,12 @@ public class NotificationService {
         return notificationRepository
                 .findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
+    }
+
+    private NotificationResponse create(CreateNotificationParams params) {
+        Notification notification = mapper.toNotification(params);
+
+        return mapper.toNotificationResponse(notificationRepository.save(notification));
     }
 
 }

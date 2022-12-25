@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +32,10 @@ public class UserService {
 
     public Page<UserResponse> listAll(Pageable pageable) {
         return userRepository.findAll(pageable).map(mapper::toUserResponse);
+    }
+
+    public List<User> listAll() {
+        return userRepository.findAll();
     }
 
     public User findByEmail(String email) throws ResourceNotFoundException {
