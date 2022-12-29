@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @DisplayName("Tests for NotificationRepository")
-public class NotificaionRepositoryTest {
+public class NotificationRepositoryTest {
 
     @Autowired
     NotificationRepository notificationRepository;

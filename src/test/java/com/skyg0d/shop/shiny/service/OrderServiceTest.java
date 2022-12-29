@@ -117,7 +117,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("listAll Returns List Of Orders Inside Page Object When Successful")
-    void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+    void listAll_ReturnsListOfOrdersInsidePageObject_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
         Page<OrderResponse> ordersPage = orderService.listAll(PageRequest.of(0, 1));
@@ -133,7 +133,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("listAllByUser Returns List Of Orders Inside Page Object When Successful")
-    void listAllByUser_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
+    void listAllByUser_ReturnsListOfOrdersInsidePageObject_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
         Page<OrderResponse> ordersPage = orderService.listAllByUser(PageRequest.of(0, 1), "some-email");
