@@ -2,7 +2,6 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.model.ERole;
-import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.repository.UserRepository;
@@ -44,13 +43,19 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        PageImpl<User> usersPage = new PageImpl<>(List.of(
+        List<User> usersList = List.of(
                 createUser()
-        ));
+        );
+
+        PageImpl<User> usersPage = new PageImpl<>(usersList);
 
         BDDMockito
                 .when(userRepository.findAll(ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(usersPage);
+
+        BDDMockito
+                .when(userRepository.findAll())
+                .thenReturn(usersList);
 
         BDDMockito
                 .when(userRepository.findByEmail(ArgumentMatchers.anyString()))
@@ -79,6 +84,20 @@ public class UserServiceTest {
         assertThat(usersPage.getContent().get(0)).isNotNull();
 
         assertThat(usersPage.getContent().get(0).getEmail()).isEqualTo(expectedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("listAll Returns List Of Users When Successful")
+    void listAll_ReturnsListOfUsers_WhenSuccessful() {
+        User expectedUser = createUser();
+
+        List<User> usersList = userService.listAll();
+
+        assertThat(usersList).isNotEmpty();
+
+        assertThat(usersList.get(0)).isNotNull();
+
+        assertThat(usersList.get(0).getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     @Test
