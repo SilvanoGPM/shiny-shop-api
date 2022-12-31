@@ -5,10 +5,12 @@ import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.util.AuthUtils;
+import com.skyg0d.shop.shiny.util.notification.NotificationCreator;
 import com.skyg0d.shop.shiny.util.user.UserCreator;
 import com.stripe.model.PaymentLink;
 import lombok.SneakyThrows;
@@ -49,6 +51,9 @@ public class OrderServiceTest {
 
     @Mock
     ProductService productService;
+
+    @Mock
+    NotificationService notificationService;
 
     @Mock
     UserService userService;
@@ -113,6 +118,10 @@ public class OrderServiceTest {
         BDDMockito
                 .when(authUtils.getUserDetails())
                 .thenReturn(new UserDetailsImpl(UUID.randomUUID(), UserCreator.USERNAME, UserCreator.EMAIL, UserCreator.PASSWORD, List.of(new SimpleGrantedAuthority("ADMIN"))));
+
+        BDDMockito
+                .when(notificationService.create(ArgumentMatchers.any(CreateNotificationRequest.class)))
+                .thenReturn(NotificationCreator.createNotificationResponse());
     }
 
     @Test
@@ -286,14 +295,11 @@ public class OrderServiceTest {
     @Test
     @DisplayName("cancelOrder Updates Order Status When Successful")
     void cancelOrder_UpdatesOrderStatus_WhenSuccessful() {
-        assertThatCode(() -> orderService.cancelOrder(UUID.randomUUID().toString()))
-                .doesNotThrowAnyException();
-    }
+        BDDMockito
+                .when(authUtils.isOwnerOrAdmin(ArgumentMatchers.anyString()))
+                .thenReturn(true);
 
-    @Test
-    @DisplayName("removePaymentLink Updates Order PaymentLink When Successful")
-    void removePaymentLink_UpdatesOrderPaymentLink_WhenSuccessful() {
-        assertThatCode(() -> orderService.removePaymentLink(UUID.randomUUID().toString()))
+        assertThatCode(() -> orderService.cancelOrder(UUID.randomUUID().toString()))
                 .doesNotThrowAnyException();
     }
 
@@ -312,14 +318,21 @@ public class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("cancelOrder Throws OrderPermissionInsufficient When Permission Is Insufficient")
-    void cancelOrder_ThrowsOrderPermissionInsufficient_WhenPermissionIsInsufficient() {
+    @DisplayName("cancelOrder Throws PermissionInsufficient When Permission Is Insufficient")
+    void cancelOrder_ThrowsPermissionInsufficient_WhenPermissionIsInsufficient() {
         BDDMockito
-                .when(authUtils.getUserDetails())
-                .thenReturn(new UserDetailsImpl(UUID.randomUUID(), UserCreator.USERNAME, "random-email", UserCreator.PASSWORD, new ArrayList<>()));
+                .when(authUtils.isOwnerOrAdmin(ArgumentMatchers.anyString()))
+                .thenReturn(false);
 
         assertThatExceptionOfType(PermissionInsufficient.class)
                 .isThrownBy(() -> orderService.cancelOrder(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    @DisplayName("removePaymentLink Updates Order PaymentLink When Successful")
+    void removePaymentLink_UpdatesOrderPaymentLink_WhenSuccessful() {
+        assertThatCode(() -> orderService.removePaymentLink(UUID.randomUUID().toString()))
+                .doesNotThrowAnyException();
     }
 
     @Test

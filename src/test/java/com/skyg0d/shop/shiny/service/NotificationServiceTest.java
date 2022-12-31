@@ -3,7 +3,6 @@ package com.skyg0d.shop.shiny.service;
 import com.skyg0d.shop.shiny.exception.PermissionInsufficient;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.payload.request.CreateNotificationToAllRequest;
 import com.skyg0d.shop.shiny.payload.response.CountNotificationsResponse;
 import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.repository.NotificationRepository;

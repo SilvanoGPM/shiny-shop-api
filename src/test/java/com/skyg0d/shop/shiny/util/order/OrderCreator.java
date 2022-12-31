@@ -54,7 +54,7 @@ public class OrderCreator {
                 .builder()
                 .greaterThanOrEqualToPrice(new BigDecimal(-1))
                 .lessThanOrEqualToPrice(new BigDecimal(-1))
-                .status("SHIPPING")
+                .status(EOrderStatus.WAITING.name())
                 .build();
     }
 

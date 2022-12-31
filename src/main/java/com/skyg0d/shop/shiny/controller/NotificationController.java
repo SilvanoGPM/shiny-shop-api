@@ -9,13 +9,13 @@ import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.payload.search.NotificationParameterSearch;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
 import com.skyg0d.shop.shiny.service.NotificationService;
+import com.skyg0d.shop.shiny.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,13 +28,12 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    private final AuthUtils authUtils;
+
     @GetMapping("/unread")
     @IsUser
     public ResponseEntity<Page<NotificationResponse>> listAllByUserUnread(@ParameterObject Pageable pageable) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
 
         return ResponseEntity.ok(notificationService.listAllByUserUnread(pageable, userDetails.getEmail()));
     }
@@ -42,10 +41,7 @@ public class NotificationController {
     @GetMapping("/read")
     @IsUser
     public ResponseEntity<Page<NotificationResponse>> listAllByUserRead(@ParameterObject Pageable pageable) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
 
         return ResponseEntity.ok(notificationService.listAllByUserRead(pageable, userDetails.getEmail()));
     }
@@ -59,10 +55,7 @@ public class NotificationController {
     @GetMapping("/count")
     @IsUser
     public ResponseEntity<CountNotificationsResponse> countAllByUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        UserDetailsImpl userDetails = authUtils.getUserDetails();
 
         return ResponseEntity.ok(notificationService.countAllByUser(userDetails.getEmail()));
     }
