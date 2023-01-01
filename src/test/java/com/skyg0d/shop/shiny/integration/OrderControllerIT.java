@@ -7,7 +7,6 @@ import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
