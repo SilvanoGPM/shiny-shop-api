@@ -85,7 +85,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PermissionInsufficient.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ExceptionDetails handleOrderPermissionInsufficient(PermissionInsufficient ex) {
+    public ExceptionDetails handlePermissionInsufficient(PermissionInsufficient ex) {
         return ExceptionDetails
                 .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Permission Insufficient");
     }

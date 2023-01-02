@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.integration;
 
+import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
@@ -22,10 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static com.skyg0d.shop.shiny.util.notification.NotificationCreator.*;
-import static com.skyg0d.shop.shiny.util.notification.NotificationCreator.createNotificationResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -203,6 +202,28 @@ public class NotificationControllerIT {
     }
 
     @Test
+    @DisplayName("read Returns ExceptionDetails When Permission Is Insufficient")
+    void read_ReturnsExceptionDetails_WhenPermissionIsInsufficient() {
+        String expectedTitle = "Permission Insufficient";
+
+        ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
+                "/notifications/{id}/read",
+                HttpMethod.PATCH,
+                jwtCreator.createOtherUserAuthEntity(null),
+                ExceptionDetails.class,
+                persistReadNotification().getId()
+        );
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getTitle()).isEqualTo(expectedTitle);
+    }
+
+    @Test
     @DisplayName("unread Updates Read At Notification To Null When Successful")
     void unread_UpdatesReadAtNotificationToNull_WhenSuccessful() {
         ResponseEntity<Void> entity = httpClient.exchange(
@@ -219,6 +240,28 @@ public class NotificationControllerIT {
     }
 
     @Test
+    @DisplayName("unread Returns ExceptionDetails When Permission Is Insufficient")
+    void unread_ReturnsExceptionDetails_WhenPermissionIsInsufficient() {
+        String expectedTitle = "Permission Insufficient";
+
+        ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
+                "/notifications/{id}/unread",
+                HttpMethod.PATCH,
+                jwtCreator.createOtherUserAuthEntity(null),
+                ExceptionDetails.class,
+                persistReadNotification().getId()
+        );
+
+        assertThat(entity).isNotNull();
+
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        assertThat(entity.getBody()).isNotNull();
+
+        assertThat(entity.getBody().getTitle()).isEqualTo(expectedTitle);
+    }
+
+    @Test
     @DisplayName("cancel Updates Canceled At Notification To Now When Successful")
     void cancel_UpdatesCanceledAtNotificationToNow_WhenSuccessful() {
         ResponseEntity<Void> entity = httpClient.exchange(
@@ -228,7 +271,7 @@ public class NotificationControllerIT {
                 Void.class,
                 persistUnreadNotification().getId()
         );
-        
+
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);

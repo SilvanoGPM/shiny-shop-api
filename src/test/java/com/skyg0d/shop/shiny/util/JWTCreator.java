@@ -46,6 +46,16 @@ public class JWTCreator {
                 .build();
     }
 
+    public User createOtherUser() {
+        return User
+                .builder()
+                .username("OtherUser")
+                .fullName("OtherUser")
+                .email("otheruser@mail.com")
+                .password(passwordEncoder.encode("password"))
+                .build();
+    }
+
     public User createModerator() {
         return User
                 .builder()
@@ -72,14 +82,20 @@ public class JWTCreator {
         Role userRole = roleRepository.save(new Role(ERole.ROLE_USER));
 
         User user = createUser();
+        User otherUser = createOtherUser();
         User moderator = createModerator();
         User admin = createAdmin();
 
         user.setRoles(Set.of(userRole));
+        otherUser.setRoles(Set.of(userRole));
         moderator.setRoles(Set.of(modRole));
         admin.setRoles(Set.of(adminRole));
 
-        userRepository.saveAll(List.of(admin, user, moderator));
+        userRepository.saveAll(List.of(admin, user, otherUser, moderator));
+    }
+
+    public <T> HttpEntity<T> createOtherUserAuthEntity(T t) {
+        return createAuthEntity(t, new LoginRequest("otheruser@mail.com", "password"));
     }
 
     public <T> HttpEntity<T> createAdminAuthEntity(T t) {
