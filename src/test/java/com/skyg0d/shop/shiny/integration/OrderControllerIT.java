@@ -7,7 +7,6 @@ import com.skyg0d.shop.shiny.model.Order;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderProduct;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.repository.OrderRepository;
@@ -351,7 +350,7 @@ public class OrderControllerIT {
     @Test
     @DisplayName("cancelOrder Returns ExceptionDetails When Order User Has Insufficient Permission")
     void cancelOrder_ReturnsExceptionDetails_WhenOrderUserHasInsufficientPermission() {
-        String expectedTitle = "Order Permission Insufficient";
+        String expectedTitle = "Permission Insufficient";
 
         ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
                 "/orders/{id}/cancel",
@@ -363,7 +362,7 @@ public class OrderControllerIT {
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
         assertThat(entity.getBody()).isNotNull();
 
