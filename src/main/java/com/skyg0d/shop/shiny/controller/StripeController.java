@@ -10,6 +10,7 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class StripeController {
     private final ObjectMapper mapper;
 
     @PostMapping("/webhook")
+    @Operation(hidden = true)
     public ResponseEntity<Void> webhook(@RequestBody String json, HttpServletRequest request) throws StripeException {
         Event event;
 

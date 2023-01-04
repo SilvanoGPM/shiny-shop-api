@@ -1,6 +1,7 @@
 package com.skyg0d.shop.shiny.controller;
 
 import com.skyg0d.shop.shiny.annotations.IsAdmin;
+import com.skyg0d.shop.shiny.annotations.IsStaff;
 import com.skyg0d.shop.shiny.model.EOrderStatus;
 import com.skyg0d.shop.shiny.payload.request.CreateOrderRequest;
 import com.skyg0d.shop.shiny.payload.response.OrderResponse;
@@ -74,6 +75,7 @@ public class OrderController {
     }
 
     @GetMapping("/search")
+    @IsStaff
     @Operation(summary = "Returns all searched orders with pagination", tags = "Orders")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
