@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -40,8 +41,10 @@ public class Order extends BaseEntity {
     @Column(columnDefinition = "varchar(255) default 'WAITING'")
     private EOrderStatus status;
 
+    @Schema(description = "Order payment link")
     private MyPaymentLink paymentLink;
 
+    @Schema(description = "Order additional and details")
     private String extra;
 
 }

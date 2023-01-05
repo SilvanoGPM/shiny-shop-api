@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
@@ -26,13 +27,17 @@ import java.util.Objects;
 public class Category extends BaseEntity {
 
     @NotBlank
+    @Schema(description = "Slug of category")
     private String slug;
 
     @NotBlank
+    @Schema(description = "Name of category")
     private String name;
 
+    @Schema(description = "Description of category")
     private String description;
 
+    @Schema(description = "Thumbnail image of category")
     private String thumbnail;
 
 }

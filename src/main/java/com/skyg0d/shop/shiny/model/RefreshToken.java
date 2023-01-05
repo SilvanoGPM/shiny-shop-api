@@ -26,6 +26,7 @@ public class RefreshToken extends BaseEntity {
     private String token;
 
     @Column(nullable = false)
+    @Schema(description = "RefreshToken expiry date")
     private Instant expiryDate;
 
     @Schema(description = "Browser that requested the token")

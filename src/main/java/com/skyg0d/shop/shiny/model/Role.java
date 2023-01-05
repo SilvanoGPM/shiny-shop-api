@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import javax.persistence.Table;
 public class Role extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Name of role")
     private ERole name;
 
     public Role(ERole name) {
