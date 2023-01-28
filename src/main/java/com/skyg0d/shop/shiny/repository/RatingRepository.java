@@ -19,4 +19,6 @@ public interface RatingRepository extends JpaRepository<Rating, UUID> {
     @Query("SELECT AVG(r.stars) FROM Rating r JOIN r.product p WHERE p.slug = ?1")
     double productStarsAverage(String productSlug);
 
+    boolean existsByProductAndUser(Product product, User user);
+
 }

@@ -111,6 +111,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .createExceptionDetails(ex, HttpStatus.FORBIDDEN, "Access Denied");
     }
 
+    @ExceptionHandler(RatingAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleRatingAlreadyExistsException(RatingAlreadyExistsException ex) {
+        return ExceptionDetails
+                .createExceptionDetails(ex, HttpStatus.BAD_REQUEST, "Rating Already Exists");
+    }
+
     @ExceptionHandler(StripeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDetails handleStripeException(StripeException ex) {

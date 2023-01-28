@@ -1,6 +1,7 @@
 package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.PermissionInsufficient;
+import com.skyg0d.shop.shiny.exception.RatingAlreadyExistsException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.mapper.RatingMapper;
 import com.skyg0d.shop.shiny.model.Product;
@@ -57,6 +58,15 @@ public class RatingService {
     }
 
     public RatingResponse create(CreateRatingRequest request, String userEmail) {
+        Product product = productService.findBySlug(request.getProductSlug());
+        User user = userService.findByEmail(userEmail);
+
+        boolean ratingAlreadyExists = ratingRepository.existsByProductAndUser(product, user);
+
+        if (ratingAlreadyExists) {
+            throw new RatingAlreadyExistsException();
+        }
+
         Rating ratingToSave = mapper.toRating(request, userEmail);
 
         return mapper.toRatingResponse(ratingRepository.save(ratingToSave));
