@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.controller;
 import com.skyg0d.shop.shiny.annotations.IsUser;
 import com.skyg0d.shop.shiny.payload.request.CreateRatingRequest;
 import com.skyg0d.shop.shiny.payload.response.RatingResponse;
+import com.skyg0d.shop.shiny.payload.response.RatingStarsAverageResponse;
 import com.skyg0d.shop.shiny.service.RatingService;
 import com.skyg0d.shop.shiny.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +26,19 @@ public class RatingController {
 
     private final AuthUtils authUtils;
 
-    @GetMapping("/all/user/{email}")
+    @GetMapping("/user/{email}/all")
     public ResponseEntity<Page<RatingResponse>> listAllByUser(@PathVariable String email, @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(ratingService.findAllByUser(email, pageable));
     }
 
-    @GetMapping("/all/product/{slug}")
+    @GetMapping("/product/{slug}/all")
     public ResponseEntity<Page<RatingResponse>> listAllByProduct(@PathVariable String slug, @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(ratingService.findAllByProduct(slug, pageable));
+    }
+
+    @GetMapping("/product/{slug}/average")
+    public ResponseEntity<RatingStarsAverageResponse> productStarsAverage(@PathVariable String slug) {
+        return ResponseEntity.ok(ratingService.productStarsAverage(slug));
     }
 
     @PostMapping

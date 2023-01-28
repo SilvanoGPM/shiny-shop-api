@@ -15,12 +15,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "ratings",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "product_id")
-        }
-)
+@Table(name = "ratings")
 public class Rating extends BaseEntity {
 
     @NotBlank

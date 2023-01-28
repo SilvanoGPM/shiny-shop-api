@@ -6,6 +6,7 @@ import com.skyg0d.shop.shiny.model.Rating;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.CreateRatingRequest;
 import com.skyg0d.shop.shiny.payload.response.RatingResponse;
+import com.skyg0d.shop.shiny.payload.response.RatingStarsAverageResponse;
 import com.skyg0d.shop.shiny.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,15 @@ public class RatingService {
         return ratingRepository
                 .findAllByProduct(product, pageable)
                 .map(mapper::toRatingResponse);
+    }
+
+    public RatingStarsAverageResponse productStarsAverage(String productSlug) {
+        productService.findBySlug(productSlug);
+
+        return RatingStarsAverageResponse
+                .builder()
+                .stars(ratingRepository.productStarsAverage(productSlug))
+                .build();
     }
 
     public RatingResponse create(CreateRatingRequest request, String userEmail) {
