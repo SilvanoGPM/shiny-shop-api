@@ -47,4 +47,11 @@ public class RatingController {
         return new ResponseEntity<>(ratingService.create(request, authUtils.getUserDetails().getEmail()), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        ratingService.delete(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }
