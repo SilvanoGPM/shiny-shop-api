@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.mapper.NotificationMapper;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
-import com.skyg0d.shop.shiny.payload.CreateNotificationParams;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationToAllRequest;
 import com.skyg0d.shop.shiny.payload.response.CountNotificationsResponse;
@@ -32,7 +31,7 @@ public class NotificationService {
 
     private final UserService userService;
 
-    private final NotificationMapper mapper = NotificationMapper.INSTANCE;
+    private final NotificationMapper mapper;
 
     public Page<NotificationResponse> listAllByUserUnread(Pageable pageable, String userEmail) {
         User user = userService.findByEmail(userEmail);
@@ -68,15 +67,11 @@ public class NotificationService {
     }
 
     public NotificationResponse create(CreateNotificationRequest request) {
-        User user = userService.findByEmail(request.getUserEmail());
-
-        return create(CreateNotificationParams.fromRequest(request, user));
+        return create(mapper.toNotification(request));
     }
 
     public void createToAllUsers(CreateNotificationToAllRequest request) {
-        userService.listAll().forEach((user) ->
-                create(CreateNotificationParams.fromRequest(request, user))
-        );
+        userService.listAll().forEach((user) -> create(mapper.toNotification(request, user)));
     }
 
     public void read(String id) {
@@ -121,9 +116,7 @@ public class NotificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
     }
 
-    private NotificationResponse create(CreateNotificationParams params) {
-        Notification notification = mapper.toNotification(params);
-
+    private NotificationResponse create(Notification notification) {
         return mapper.toNotificationResponse(notificationRepository.save(notification));
     }
 
