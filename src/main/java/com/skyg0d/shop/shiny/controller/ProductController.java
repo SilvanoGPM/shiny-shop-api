@@ -61,7 +61,7 @@ public class ProductController {
     @Operation(summary = "Returns product by slug", tags = "Products")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successful"),
-            @ApiResponse(responseCode = "400", description = "When category not found"),
+            @ApiResponse(responseCode = "400", description = "When product not found"),
             @ApiResponse(responseCode = "500", description = "When server error")
     })
     public ResponseEntity<UserProductResponse> findBySlug(@PathVariable String slug) {

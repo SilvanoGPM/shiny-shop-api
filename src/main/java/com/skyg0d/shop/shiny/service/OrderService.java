@@ -70,30 +70,12 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse create(CreateOrderRequest request, String email) throws StripeException {
-        User user = userService.findByEmail(email);
+    public OrderResponse create(CreateOrderRequest request, String userEmail) throws StripeException {
+        User user = userService.findByEmail(userEmail);
 
         List<ProductCalculate> products = getProducts(request.getProducts());
 
-        List<Product> productsIds = products
-                .stream()
-                .map((product) -> {
-                    List<Product> totalProducts = new ArrayList<>();
-
-                    for (int i = 0; i < product.getAmount(); i++) {
-                        Product productCreated = Product
-                                .builder()
-                                .id(product.getId())
-                                .slug(product.getSlug())
-                                .build();
-
-                        totalProducts.add(productCreated);
-                    }
-
-                    return totalProducts;
-                })
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        List<Product> productsIds = getProductsIds(products);
 
         BigDecimal price = products
                 .stream()
@@ -119,7 +101,7 @@ public class OrderService {
 
         Order orderSaved = orderRepository.save(order);
 
-        PaymentLink paymentLink = createPaymentLink(products, email, orderSaved.getId().toString());
+        PaymentLink paymentLink = createPaymentLink(products, userEmail, orderSaved.getId().toString());
 
         orderSaved.setPaymentLink(
                 MyPaymentLink
@@ -230,6 +212,28 @@ public class OrderService {
                             .amount(productRaw.getAmount())
                             .build();
                 })
+                .collect(Collectors.toList());
+    }
+
+    private List<Product> getProductsIds(List<ProductCalculate> products) {
+        return products
+                .stream()
+                .map((product) -> {
+                    List<Product> totalProducts = new ArrayList<>();
+
+                    for (int i = 0; i < product.getAmount(); i++) {
+                        Product productCreated = Product
+                                .builder()
+                                .id(product.getId())
+                                .slug(product.getSlug())
+                                .build();
+
+                        totalProducts.add(productCreated);
+                    }
+
+                    return totalProducts;
+                })
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
 

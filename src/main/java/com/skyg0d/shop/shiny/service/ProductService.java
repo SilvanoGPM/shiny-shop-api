@@ -38,7 +38,7 @@ public class ProductService {
 
     private final StripeService stripeService;
 
-    private final ProductMapper mapper = ProductMapper.INSTANCE;
+    private final ProductMapper mapper;
 
     public Page<AdminProductResponse> listAll(Pageable pageable) {
         return productRepository.findAll(pageable).map(mapper::toAdminProductResponse);
@@ -74,8 +74,6 @@ public class ProductService {
         verifySlugExists(request.getSlug());
 
         Product productMapped = mapper.toProduct(request);
-        productMapped.setCategories(getCategories(request.getCategories()));
-
         com.stripe.model.Product stripeProduct = stripeService.createProduct(request);
 
         Price stripePrice = stripeService.createPrice(stripeProduct.getId(), productMapped.getPrice());
@@ -91,16 +89,11 @@ public class ProductService {
     @Transactional
     public void replace(ReplaceProductRequest request) throws StripeException {
         Product productFound = findBySlug(request.getSlug());
-        Product productMapped = mapper.toProduct(request);
+        Product productMapped = mapper.toProduct(request, productFound);
 
-        Set<Category> categories = getCategories(request.getCategories());
+        boolean priceHasChanged = productFound.getPrice().compareTo(request.getPrice()) != 0;
 
-        productMapped.setId(productFound.getId());
-        productMapped.setCategories(categories);
-        productMapped.setStripePriceId(productFound.getStripePriceId());
-        productMapped.setStripeProductId(productFound.getStripeProductId());
-
-        if (productFound.getPrice().compareTo(request.getPrice()) != 0) {
+        if (priceHasChanged) {
             stripeService.desactivePrice(productFound.getStripePriceId());
             stripeService.createPrice(productFound.getStripeProductId(), request.getPrice());
         }
@@ -207,13 +200,6 @@ public class ProductService {
         }
 
         productRepository.delete(productFound);
-    }
-
-    private Set<Category> getCategories(Set<String> categories) {
-        return categories
-                .stream()
-                .map(categoryService::findBySlug)
-                .collect(Collectors.toSet());
     }
 
 }
