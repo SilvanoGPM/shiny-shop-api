@@ -76,6 +76,7 @@ public class Product extends BaseEntity {
     @Schema(description = "Code to apply discount")
     private String discountCode;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "product_categories",
@@ -85,14 +86,17 @@ public class Product extends BaseEntity {
     @Schema(description = "Product categories")
     private Set<Category> categories = new HashSet<>();
 
+    @Builder.Default
     @ElementCollection(targetClass = String.class)
     @Schema(description = "Product images")
     private List<String> images = new ArrayList<>();
 
+    @Builder.Default
     @ElementCollection(targetClass = String.class)
     @Schema(description = "Product sizes (empty if the product has no sizes to choose from)")
     private List<String> sizes = new ArrayList<>();
 
+    @Builder.Default
     @ElementCollection(targetClass = String.class)
     @Schema(description = "Product features (empty if the product has no features to show)")
     private List<String> features = new ArrayList<>();

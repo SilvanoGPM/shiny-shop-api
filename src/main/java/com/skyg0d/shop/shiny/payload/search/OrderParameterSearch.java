@@ -12,7 +12,10 @@ import java.math.BigDecimal;
 @Setter
 public class OrderParameterSearch extends AbstractParameterSearch {
 
+    @Builder.Default
     private BigDecimal greaterThanOrEqualToPrice = new BigDecimal(-1);
+
+    @Builder.Default
     private BigDecimal lessThanOrEqualToPrice = new BigDecimal(-1);
 
     private String productName;

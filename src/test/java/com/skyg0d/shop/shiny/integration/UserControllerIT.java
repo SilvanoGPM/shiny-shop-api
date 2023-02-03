@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.model.RefreshToken;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.PromoteRequest;
 import com.skyg0d.shop.shiny.payload.request.ReplaceUserRequest;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.payload.response.UserTokenResponse;
 import com.skyg0d.shop.shiny.repository.RefreshTokenRepository;

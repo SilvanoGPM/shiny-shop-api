@@ -1,5 +1,6 @@
 package com.skyg0d.shop.shiny.util;
 
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -22,12 +23,13 @@ public class HttpUtils {
     };
 
     public static String getClientIp() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-        if (RequestContextHolder.getRequestAttributes() == null) {
+        if (requestAttributes == null) {
             return "0.0.0.0";
         }
 
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 
         for (String header : IP_HEADER_CANDIDATES) {
             String ipList = request.getHeader(header);

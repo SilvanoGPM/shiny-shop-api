@@ -24,6 +24,7 @@ public class Order extends BaseEntity {
     @Positive
     private BigDecimal price;
 
+    @Builder.Default
     @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

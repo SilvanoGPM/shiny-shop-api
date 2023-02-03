@@ -4,7 +4,6 @@ import com.skyg0d.shop.shiny.security.jwt.AuthEntryPointJwt;
 import com.skyg0d.shop.shiny.security.jwt.AuthTokenFilter;
 import com.skyg0d.shop.shiny.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-@Log4j2
 public class SecurityConfiguration {
 
     final UserDetailsServiceImpl userDetailsService;

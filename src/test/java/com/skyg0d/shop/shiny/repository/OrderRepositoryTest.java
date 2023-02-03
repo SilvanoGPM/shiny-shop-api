@@ -1,7 +1,6 @@
 package com.skyg0d.shop.shiny.repository;
 
 import com.skyg0d.shop.shiny.model.*;
-import com.skyg0d.shop.shiny.payload.response.OrderResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import static com.skyg0d.shop.shiny.util.order.OrderCreator.createOrder;
-import static com.skyg0d.shop.shiny.util.order.OrderCreator.createOrderResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest

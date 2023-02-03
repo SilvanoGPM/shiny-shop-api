@@ -25,9 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

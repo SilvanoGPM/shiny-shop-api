@@ -24,6 +24,7 @@ public class UserResponse {
 
     private Address address;
 
+    @Builder.Default
     private Set<String> roles = new HashSet<>();
 
 }

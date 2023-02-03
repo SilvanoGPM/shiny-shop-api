@@ -13,9 +13,11 @@ public class TokenRefreshResponse {
 
     @Schema(description = "New token generated")
     private String accessToken;
+    
     @Schema(description = "Token to generate others access tokens")
     private String refreshToken;
 
+    @Builder.Default
     @Schema(description = "Type of token")
     private String tokenType = "Bearer";
 

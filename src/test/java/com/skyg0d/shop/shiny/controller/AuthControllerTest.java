@@ -5,7 +5,6 @@ import com.skyg0d.shop.shiny.payload.request.LoginRequest;
 import com.skyg0d.shop.shiny.payload.request.SignupRequest;
 import com.skyg0d.shop.shiny.payload.request.TokenRefreshRequest;
 import com.skyg0d.shop.shiny.payload.response.JwtResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.payload.response.TokenRefreshResponse;
 import com.skyg0d.shop.shiny.payload.response.UserResponse;
 import com.skyg0d.shop.shiny.security.service.UserDetailsImpl;
@@ -98,10 +97,6 @@ public class AuthControllerTest {
         assertThat(entity).isNotNull();
 
         assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        assertThat(entity.getBody()).isNotNull();
-
-        assertThat(entity.getBody()).isNotNull();
 
         assertThat(entity.getBody()).isNotNull();
 

@@ -3,7 +3,6 @@ package com.skyg0d.shop.shiny.integration;
 import com.skyg0d.shop.shiny.exception.details.ExceptionDetails;
 import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
-import com.skyg0d.shop.shiny.payload.response.MessageResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
 import com.skyg0d.shop.shiny.util.JWTCreator;
 import com.skyg0d.shop.shiny.wrapper.PageableResponse;

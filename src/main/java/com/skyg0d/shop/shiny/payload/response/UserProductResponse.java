@@ -39,12 +39,16 @@ public class UserProductResponse {
 
     private String discountCode;
 
+    @Builder.Default
     private Set<CategoryResponse> categories = new HashSet<>();
 
+    @Builder.Default
     private List<String> images = new ArrayList<>();
 
+    @Builder.Default
     private List<String> sizes = new ArrayList<>();
 
+    @Builder.Default
     private List<String> features = new ArrayList<>();
 
 }

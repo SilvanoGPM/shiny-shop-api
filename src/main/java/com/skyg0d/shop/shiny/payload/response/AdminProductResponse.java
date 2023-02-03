@@ -1,6 +1,5 @@
 package com.skyg0d.shop.shiny.payload.response;
 
-import com.skyg0d.shop.shiny.model.Category;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -47,12 +46,16 @@ public class AdminProductResponse {
 
     private String stripeCouponId;
 
+    @Builder.Default
     private Set<CategoryResponse> categories = new HashSet<>();
 
+    @Builder.Default
     private List<String> images = new ArrayList<>();
 
+    @Builder.Default
     private List<String> sizes = new ArrayList<>();
 
+    @Builder.Default
     private List<String> features = new ArrayList<>();
 
     private boolean active;

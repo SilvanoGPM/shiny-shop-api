@@ -54,6 +54,7 @@ public class User extends BaseEntity {
     @Schema(description = "Password of user")
     private String password;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

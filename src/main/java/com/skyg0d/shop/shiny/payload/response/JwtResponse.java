@@ -14,13 +14,20 @@ public class JwtResponse {
 
     @Schema(description = "Token to access protected endpoints")
     private String token;
+
+    @Builder.Default
     @Schema(description = "Type of token")
     private String type = "Bearer";
+
     @Schema(description = "Token to generate others access tokens")
     private String refreshToken;
+
     private String id;
+
     private String username;
+
     private String email;
+
     private List<String> roles;
 
     public JwtResponse(String accessToken, String refreshToken, String id, String username, String email, List<String> roles) {

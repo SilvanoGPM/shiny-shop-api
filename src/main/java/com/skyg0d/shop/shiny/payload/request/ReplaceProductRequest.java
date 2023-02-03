@@ -34,6 +34,7 @@ public class ReplaceProductRequest {
     @PositiveOrZero
     private long amount;
 
+    @Builder.Default
     private Set<String> categories = new HashSet<>();
 
     private Set<String> images;
