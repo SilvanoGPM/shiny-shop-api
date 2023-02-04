@@ -1,8 +1,11 @@
 package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.PermissionInsufficient;
+import com.skyg0d.shop.shiny.mapper.NotificationMapper;
+import com.skyg0d.shop.shiny.mapper.NotificationMapperImpl;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
+import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
 import com.skyg0d.shop.shiny.payload.response.CountNotificationsResponse;
 import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.repository.NotificationRepository;
@@ -11,10 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +46,9 @@ public class NotificationServiceTest {
 
     @Mock
     UserService userService;
+
+    @Spy
+    NotificationMapper notificationMapper = NotificationMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {
@@ -162,6 +165,10 @@ public class NotificationServiceTest {
     @Test
     @DisplayName("create Persists Notification When Successful")
     void create_PersistsNotification_WhenSuccessful() {
+        BDDMockito
+                .when(notificationMapper.toNotification(ArgumentMatchers.any(CreateNotificationRequest.class)))
+                .thenReturn(createNotification());
+
         Notification expectedNotification = createNotification();
 
         NotificationResponse createdNotification = notificationService.create(createCreateNotificationRequest());

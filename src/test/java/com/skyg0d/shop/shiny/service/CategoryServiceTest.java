@@ -2,6 +2,7 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
+import com.skyg0d.shop.shiny.mapper.CategoryMapper;
 import com.skyg0d.shop.shiny.model.Category;
 import com.skyg0d.shop.shiny.payload.response.CategoryResponse;
 import com.skyg0d.shop.shiny.repository.CategoryRepository;
@@ -9,10 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +33,9 @@ public class CategoryServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
+
+    @Spy
+    CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {

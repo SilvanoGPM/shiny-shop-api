@@ -7,6 +7,7 @@ import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationToAllRequest;
 import com.skyg0d.shop.shiny.payload.response.NotificationResponse;
 import com.skyg0d.shop.shiny.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

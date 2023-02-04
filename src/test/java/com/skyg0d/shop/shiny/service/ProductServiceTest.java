@@ -3,6 +3,7 @@ package com.skyg0d.shop.shiny.service;
 import com.skyg0d.shop.shiny.exception.ProductCategoryNotFoundException;
 import com.skyg0d.shop.shiny.exception.ResourceNotFoundException;
 import com.skyg0d.shop.shiny.exception.SlugAlreadyExistsException;
+import com.skyg0d.shop.shiny.mapper.ProductMapper;
 import com.skyg0d.shop.shiny.model.Product;
 import com.skyg0d.shop.shiny.payload.ApplyDiscountParams;
 import com.skyg0d.shop.shiny.payload.request.CreateProductRequest;
@@ -18,10 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +51,9 @@ public class ProductServiceTest {
 
     @Mock
     StripeService stripeService;
+
+    @Spy
+    ProductMapper productMapper = ProductMapper.INSTANCE;
 
     @BeforeEach
     @SneakyThrows
@@ -252,6 +253,10 @@ public class ProductServiceTest {
     @DisplayName("create Persists Product When Successful")
     @SneakyThrows
     void create_PersistsProduct_WhenSuccessful() {
+        BDDMockito
+                .when(productMapper.toProduct(ArgumentMatchers.any(CreateProductRequest.class)))
+                .thenReturn(createProduct());
+
         UserProductResponse expectedProduct = createUserProductResponse();
 
         AdminProductResponse productFound = productService.create(createCreateProductRequest());
@@ -264,6 +269,10 @@ public class ProductServiceTest {
     @Test
     @DisplayName("replace Updates Product When Successful")
     void replace_UpdatesProduct_WhenSuccessful() {
+        BDDMockito
+                .when(productMapper.toProduct(ArgumentMatchers.any(ReplaceProductRequest.class), ArgumentMatchers.any(Product.class)))
+                .thenReturn(createProduct());
+
         assertThatCode(() -> productService.replace(createReplaceProductRequest()))
                 .doesNotThrowAnyException();
 

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper mapper = CategoryMapper.INSTANCE;
+    private final CategoryMapper mapper;
 
     public Page<CategoryResponse> listAll(Pageable pageable) {
         return categoryRepository.findAll(pageable).map(mapper::toCategoryResponse);
