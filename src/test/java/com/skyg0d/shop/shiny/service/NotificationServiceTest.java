@@ -2,7 +2,6 @@ package com.skyg0d.shop.shiny.service;
 
 import com.skyg0d.shop.shiny.exception.PermissionInsufficient;
 import com.skyg0d.shop.shiny.mapper.NotificationMapper;
-import com.skyg0d.shop.shiny.mapper.NotificationMapperImpl;
 import com.skyg0d.shop.shiny.model.Notification;
 import com.skyg0d.shop.shiny.model.User;
 import com.skyg0d.shop.shiny.payload.request.CreateNotificationRequest;

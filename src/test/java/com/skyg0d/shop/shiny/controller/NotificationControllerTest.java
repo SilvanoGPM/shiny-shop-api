@@ -82,6 +82,7 @@ public class NotificationControllerTest {
 
     @Test
     @DisplayName("listAllByUserUnread Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUserUnread_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         NotificationResponse expectedNotification = createNotificationResponse();
 
@@ -104,6 +105,7 @@ public class NotificationControllerTest {
 
     @Test
     @DisplayName("listAllByUserRead Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUserRead_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         NotificationResponse expectedNotification = createNotificationResponse();
 
@@ -126,6 +128,7 @@ public class NotificationControllerTest {
 
     @Test
     @DisplayName("countAllByUser Returns Total Of Notifications When Successful")
+    @SuppressWarnings("null")
     void countAllByUser_ReturnsTotalOfNotifications_WhenSuccessful() {
         ResponseEntity<CountNotificationsResponse> entity = notificationController.countAllByUser();
 
@@ -140,6 +143,7 @@ public class NotificationControllerTest {
 
     @Test
     @DisplayName("search Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         Notification expectedNotification = createNotification();
 
@@ -160,6 +164,7 @@ public class NotificationControllerTest {
 
     @Test
     @DisplayName("create Persists Notification When Successful")
+    @SuppressWarnings("null")
     void create_PersistsNotification_WhenSuccessful() {
         NotificationResponse expectedNotification = createNotificationResponse();
 

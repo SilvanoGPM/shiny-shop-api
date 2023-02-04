@@ -82,6 +82,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("listAll Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         Order expectedOrder = persistOrder();
 
@@ -109,6 +110,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("listAllByUser Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUser_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         Order expectedOrder = persistOrder();
 
@@ -134,6 +136,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("findById Returns Order When Successful")
+    @SuppressWarnings("null")
     void findById_ReturnsOrder_WhenSuccessful() {
         Order expectedOrder = persistOrder();
 
@@ -156,6 +159,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("search Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         Order expectedOrder = persistOrder();
 
@@ -181,6 +185,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("mySearch Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void mySearch_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         Order expectedOrder = persistOrder();
 
@@ -206,6 +211,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("findById Returns ExceptionDetails When Order Don't Exists")
+    @SuppressWarnings("null")
     void findById_ReturnsExceptionDetails_WhenOrderDoNotExists() {
         String expectedTitle = "Resource Not Found";
 
@@ -228,6 +234,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("create Persists Order When Successful")
+    @SuppressWarnings("null")
     void create_PersistsOrder_WhenSuccessful() {
         persistOrder();
 
@@ -255,6 +262,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("create Returns ExceptionDetails When Order Has Invalid Product")
+    @SuppressWarnings("null")
     void create_ReturnsExceptionDetails_WhenOrderHasInvalidProduct() {
         persistOrder(EOrderStatus.WAITING, 10, false);
 
@@ -282,6 +290,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("create Returns ExceptionDetails When Order Product No Stock")
+    @SuppressWarnings("null")
     void create_ReturnsExceptionDetails_WhenOrderProductNoStock() {
         persistOrder(EOrderStatus.WAITING, 0);
 
@@ -327,6 +336,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("cancelOrder Returns ExceptionDetails When Order Already Delivered")
+    @SuppressWarnings("null")
     void cancelOrder_ReturnsExceptionDetails_WhenOrderAlreadyDelivered() {
         String expectedTitle = "Order Status Incorrect";
 
@@ -349,6 +359,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("cancelOrder Returns ExceptionDetails When Order User Has Insufficient Permission")
+    @SuppressWarnings("null")
     void cancelOrder_ReturnsExceptionDetails_WhenOrderUserHasInsufficientPermission() {
         String expectedTitle = "Permission Insufficient";
 
@@ -389,6 +400,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("shipOrder Returns ExceptionDetails When Already Canceled")
+    @SuppressWarnings("null")
     void shipOrder_ReturnsExceptionDetails_WhenOrderAlreadyCanceled() {
         String expectedTitle = "Order Status Incorrect";
 
@@ -429,6 +441,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("onTheWayOrder Returns ExceptionDetails When Order Already Canceled")
+    @SuppressWarnings("null")
     void onTheWayOrder_ReturnsExceptionDetails_WhenOrderAlreadyCanceled() {
         String expectedTitle = "Order Status Incorrect";
 
@@ -469,6 +482,7 @@ public class OrderControllerIT {
 
     @Test
     @DisplayName("deliverOrder Returns ExceptionDetails When Order Already Canceled")
+    @SuppressWarnings("null")
     void deliverOrder_ReturnsExceptionDetails_WhenOrderAlreadyCanceled() {
         String expectedTitle = "Order Status Incorrect";
 
@@ -507,8 +521,10 @@ public class OrderControllerIT {
         Product productToBeSave = orderToBeSave.getProducts().get(0);
         productToBeSave.setAmount(amount);
         productToBeSave.setActive(active);
+
         List<Category> categoriesSaved = categoryRepository.saveAllAndFlush(productToBeSave.getCategories());
         productToBeSave.setCategories(new HashSet<>(categoriesSaved));
+       
         Product productSaved = productRepository.save(productToBeSave);
 
         orderToBeSave.setProducts(List.of(productSaved));

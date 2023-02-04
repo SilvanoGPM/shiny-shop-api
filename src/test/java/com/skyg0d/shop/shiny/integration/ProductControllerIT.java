@@ -91,6 +91,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("listAllActive Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllActive_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
@@ -118,6 +119,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("listAll Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         AdminProductResponse expectedProduct = createAdminProductResponse();
 
@@ -145,6 +147,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("findBySlug Returns Product When Successful")
+    @SuppressWarnings("null")
     void findBySlug_ReturnsProduct_WhenSuccessful() {
         Product expectedProduct = createProduct();
 
@@ -169,6 +172,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("findBySlug Returns ExceptionDetails When Product Don't Exists")
+    @SuppressWarnings("null")
     void findBySlug_ReturnsExceptionDetails_WhenProductDoNotExists() {
         String expectedTitle = "Resource Not Found";
 
@@ -191,6 +195,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("search Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
@@ -257,6 +262,7 @@ public class ProductControllerIT {
     @SneakyThrows
     @Test
     @DisplayName("create Persists Product When Successful")
+    @SuppressWarnings("null")
     void create_PersistsProduct_WhenSuccessful() {
         AdminProductResponse expectedProduct = createAdminProductResponse();
 
@@ -500,6 +506,7 @@ public class ProductControllerIT {
 
     @Test
     @DisplayName("removeCategory Returns ExceptionDetails When Category Not Found On Product")
+    @SuppressWarnings("null")
     void removeCategory_ReturnsExceptionDetails_WhenCategoryNotFoundOnProduct() {
         String expectedTitle = "Product Category Not Found";
 

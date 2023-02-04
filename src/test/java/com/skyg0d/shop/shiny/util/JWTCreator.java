@@ -114,13 +114,15 @@ public class JWTCreator {
         ResponseEntity<JwtResponse> entity = testRestTemplate
                 .postForEntity("/auth/signin", new HttpEntity<>(login), JwtResponse.class);
 
-        if (entity.getBody() != null && entity.getBody().getToken().isEmpty()) {
+        JwtResponse body = entity.getBody();
+
+        if (body == null || body.getToken().isEmpty()) {
             throw new RuntimeException("Empty access token.");
         }
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.setBearerAuth(entity.getBody().getToken());
+        headers.setBearerAuth(body.getToken());
 
         return new HttpEntity<>(t, headers);
     }

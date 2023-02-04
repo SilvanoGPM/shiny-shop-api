@@ -47,6 +47,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("listAllByUserUnread Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUserUnread_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         Notification expectedNotification = persistUnreadNotification();
 
@@ -74,6 +75,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("listAllByUserRead Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUserRead_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         Notification expectedNotification = persistReadNotification();
 
@@ -101,6 +103,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("countAllByUser Returns Total Of Notifications When Successful")
+    @SuppressWarnings("null")
     void countAllByUser_ReturnsTotalOfNotifications_WhenSuccessful() {
         persistUnreadNotification();
 
@@ -120,8 +123,9 @@ public class NotificationControllerIT {
         assertThat(entity.getBody().getCount()).isEqualTo(1);
     }
 
-    @Test
+    @Test()
     @DisplayName("search Returns List Of Notifications Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfNotificationsInsidePageObject_WhenSuccessful() {
         Notification expectedNotification = persistUnreadNotification();
 
@@ -148,6 +152,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("create Persists Notification When Successful")
+    @SuppressWarnings("null")
     void create_PersistsNotification_WhenSuccessful() {
         NotificationResponse expectedNotification = createNotificationResponse();
 
@@ -203,6 +208,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("read Returns ExceptionDetails When Permission Is Insufficient")
+    @SuppressWarnings("null")
     void read_ReturnsExceptionDetails_WhenPermissionIsInsufficient() {
         String expectedTitle = "Permission Insufficient";
 
@@ -241,6 +247,7 @@ public class NotificationControllerIT {
 
     @Test
     @DisplayName("unread Returns ExceptionDetails When Permission Is Insufficient")
+    @SuppressWarnings("null")
     void unread_ReturnsExceptionDetails_WhenPermissionIsInsufficient() {
         String expectedTitle = "Permission Insufficient";
 

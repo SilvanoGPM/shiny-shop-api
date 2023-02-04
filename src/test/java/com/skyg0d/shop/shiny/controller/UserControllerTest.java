@@ -95,6 +95,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("listAll Returns List Of Users Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
         UserResponse expectedUser = createUserResponse();
 
@@ -131,6 +132,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("listMyAllTokens Returns List Of Refresh Tokens Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listMyAllTokens_ReturnsListOfRefreshTokensInsidePageObject_WhenSuccessful() {
         MockUtils.mockSecurityContextHolder();
 
@@ -157,6 +159,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("findByEmail Returns User When Successful")
+    @SuppressWarnings("null")
     void findByEmail_ReturnsUser_WhenSuccessful() {
         User expectedUser = createUser();
 
@@ -173,6 +176,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("search Returns List Of Users Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
         UserResponse expectedUser = createUserResponse();
 

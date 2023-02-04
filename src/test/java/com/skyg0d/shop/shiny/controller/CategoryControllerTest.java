@@ -71,6 +71,7 @@ public class CategoryControllerTest {
 
     @Test
     @DisplayName("listAll Returns List Of Categories Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         CategoryResponse expectedCategory = createCategoryResponse();
 
@@ -91,6 +92,7 @@ public class CategoryControllerTest {
 
     @Test
     @DisplayName("findBySlug Returns Category When Successful")
+    @SuppressWarnings("null")
     void findBySlug_ReturnsCategory_WhenSuccessful() {
         Category expectedCategory = createCategory();
 
@@ -107,6 +109,7 @@ public class CategoryControllerTest {
 
     @Test
     @DisplayName("search Returns List Of Categories Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         CategoryResponse expectedCategory = createCategoryResponse();
 
@@ -161,6 +164,7 @@ public class CategoryControllerTest {
 
     @Test
     @DisplayName("create Persists Category When Successful")
+    @SuppressWarnings("null")
     void create_PersistsCategory_WhenSuccessful() {
         CategoryResponse expectedCategory = createCategoryResponse();
 

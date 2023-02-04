@@ -49,6 +49,7 @@ public class UserControllerIT {
 
     @Test
     @DisplayName("listAll Returns List Of Users Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
         UserResponse expectedUser = UserMapper.INSTANCE.toUserResponse(findUserByEmail(jwtCreator.createUser().getEmail()));
 
@@ -97,6 +98,7 @@ public class UserControllerIT {
 
     @Test
     @DisplayName("listMyAllTokens Returns List Of Refresh Tokens Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listMyAllTokens_ReturnsListOfRefreshTokensInsidePageObject_WhenSuccessful() {
         RefreshToken refreshToken = createRefreshToken();
 
@@ -128,6 +130,7 @@ public class UserControllerIT {
 
     @Test
     @DisplayName("findByEmail Returns User When Successful")
+    @SuppressWarnings("null")
     void findByEmail_ReturnsUser_WhenSuccessful() {
         User expectedUser = jwtCreator.createUser();
 
@@ -150,6 +153,7 @@ public class UserControllerIT {
 
     @Test
     @DisplayName("search Returns List Of Users Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfUsersInsidePageObject_WhenSuccessful() {
         UserResponse expectedUser = UserMapper.INSTANCE.toUserResponse(findUserByEmail(jwtCreator.createUser().getEmail()));
 

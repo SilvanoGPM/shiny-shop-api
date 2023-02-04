@@ -106,6 +106,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("listAllActive Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllActive_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
@@ -126,6 +127,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("listAll Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         AdminProductResponse expectedProduct = createAdminProductResponse();
 
@@ -146,6 +148,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("findBySlug Returns Product When Successful")
+    @SuppressWarnings("null")
     void findBySlug_ReturnsProduct_WhenSuccessful() {
         Product expectedProduct = createProduct();
 
@@ -162,6 +165,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("search Returns List Of Products Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfProductsInsidePageObject_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 
@@ -217,6 +221,7 @@ public class ProductControllerTest {
     @Test
     @DisplayName("create Persists Product When Successful")
     @SneakyThrows
+    @SuppressWarnings("null")
     void create_PersistsProduct_WhenSuccessful() {
         UserProductResponse expectedProduct = createUserProductResponse();
 

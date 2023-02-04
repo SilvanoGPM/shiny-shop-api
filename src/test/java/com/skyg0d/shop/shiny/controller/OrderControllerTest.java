@@ -89,6 +89,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("listAll Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAll_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
@@ -109,6 +110,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("listAllByUser Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void listAllByUser_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         MockUtils.mockSecurityContextHolder();
 
@@ -131,6 +133,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("findById Returns Order When Successful")
+    @SuppressWarnings("null")
     void findById_ReturnsOrder_WhenSuccessful() {
         Order expectedOrder = createOrder();
 
@@ -147,6 +150,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("search Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void search_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
@@ -167,6 +171,7 @@ public class OrderControllerTest {
 
     @Test
     @DisplayName("mySearch Returns List Of Orders Inside Page Object When Successful")
+    @SuppressWarnings("null")
     void mySearch_ReturnsListOfCategoriesInsidePageObject_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 
@@ -188,6 +193,7 @@ public class OrderControllerTest {
     @Test
     @DisplayName("create Persists Order When Successful")
     @SneakyThrows
+    @SuppressWarnings("null")
     void create_PersistsOrder_WhenSuccessful() {
         OrderResponse expectedOrder = createOrderResponse();
 

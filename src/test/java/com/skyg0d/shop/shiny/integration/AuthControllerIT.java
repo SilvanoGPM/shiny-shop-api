@@ -48,6 +48,7 @@ public class AuthControllerIT {
 
     @Test
     @DisplayName("signIn Returns JwtResponse When Successful")
+    @SuppressWarnings("null")
     void signIn_ReturnsJwtResponse_WhenSuccessful() {
         LoginRequest login = LoginRequest
                 .builder()
@@ -69,6 +70,7 @@ public class AuthControllerIT {
 
     @Test
     @DisplayName("signUp_SaveUser_WhenSuccessful")
+    @SuppressWarnings("null")
     void signUp_SaveUser_WhenSuccessful() {
         SignupRequest signup = SignupRequest
                 .builder()
@@ -94,6 +96,7 @@ public class AuthControllerIT {
 
     @Test
     @DisplayName("refreshToken Returns Token Refresh When Successful")
+    @SuppressWarnings("null")
     void refreshToken_ReturnsTokenRefresh_WhenSuccessful() {
         jwtCreator.createAdminAuthEntity(null);
 
@@ -134,6 +137,7 @@ public class AuthControllerIT {
 
     @Test
     @DisplayName("logout Returns 400 BadRequest When User Not Logged")
+    @SuppressWarnings("null")
     void logout_Returns400BadRequest_WhenUserNotLogged() {
         ResponseEntity<ExceptionDetails> entity = httpClient.exchange(
                 "/auth/logout",

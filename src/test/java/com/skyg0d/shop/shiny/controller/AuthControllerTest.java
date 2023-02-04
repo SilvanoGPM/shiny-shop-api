@@ -46,7 +46,8 @@ public class AuthControllerTest {
     @BeforeEach
     void setUp() {
         BDDMockito
-                .when(authService.signIn(ArgumentMatchers.any(LoginRequest.class), ArgumentMatchers.any(UserMachineDetails.class)))
+                .when(authService.signIn(ArgumentMatchers.any(LoginRequest.class),
+                        ArgumentMatchers.any(UserMachineDetails.class)))
                 .thenReturn(createJwtResponse());
 
         BDDMockito
@@ -69,6 +70,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("signIn Returns JwtResponse When Successful")
+    @SuppressWarnings("null")
     void signIn_ReturnsJwtResponse_WhenSuccessful() {
         JwtResponse expectedResponse = createJwtResponse();
 
@@ -89,6 +91,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("signUp_PersistsUser_WhenSuccessful")
+    @SuppressWarnings("null")
     void signUp_PersistsUser_WhenSuccessful() {
         UserResponse expectedUser = createUserResponse();
 
@@ -105,6 +108,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("refreshToken Returns Token Refresh When Successful")
+    @SuppressWarnings("null")
     void refreshToken_ReturnsTokenRefresh_WhenSuccessful() {
         TokenRefreshResponse expectedResponse = createTokenRefreshResponse();
 
