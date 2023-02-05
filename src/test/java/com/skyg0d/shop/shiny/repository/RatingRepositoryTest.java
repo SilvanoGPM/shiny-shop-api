@@ -31,7 +31,6 @@ public class RatingRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-
     @Test
     @DisplayName("findAllByUser Returns List Of Ratings Inside Page Object When Successful")
     void findAllByUser_ReturnsListOfRatingsInsidePageObject_WhenSuccessful() {
