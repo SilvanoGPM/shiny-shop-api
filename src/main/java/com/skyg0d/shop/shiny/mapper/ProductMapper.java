@@ -26,7 +26,6 @@ public abstract class ProductMapper {
     public abstract Product toProduct(CreateProductRequest request);
 
     @Mapping(target = "categories", source = "request.categories", qualifiedByName = "mapCategories")
-
     public abstract Product toProduct(ReplaceProductRequest request, @MappingTarget Product product);
 
     public abstract UserProductResponse toUserProductResponse(Product product);

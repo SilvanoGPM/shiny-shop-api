@@ -25,11 +25,8 @@ public class RatingService {
 
     private final RatingRepository ratingRepository;
     private final UserService userService;
-
     private final ProductService productService;
-
     private final RatingMapper mapper;
-
     private final AuthUtils authUtils;
 
     public Page<RatingResponse> findAllByUser(String userEmail, Pageable pageable) {

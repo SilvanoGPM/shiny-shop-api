@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class RatingMapper {
+
+    public static final RatingMapper INSTANCE = Mappers.getMapper(RatingMapper.class);
 
     @Autowired
     protected UserService userService;
@@ -37,6 +40,10 @@ public abstract class RatingMapper {
 
     @Named("mapUserFromEmail")
     protected User mapUserFromEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+
         return userService.findByEmail(email);
     }
 
