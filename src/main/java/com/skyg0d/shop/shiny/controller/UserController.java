@@ -65,6 +65,24 @@ public class UserController {
         return ResponseEntity.ok(userService.findByEmailMapped(email));
     }
 
+    @GetMapping("/me")
+    @IsUser
+    @Operation(summary = "Get user information", tags = "Users")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successful"),
+            @ApiResponse(responseCode = "401", description = "When not authorized"),
+            @ApiResponse(responseCode = "403", description = "When forbidden"),
+            @ApiResponse(responseCode = "500", description = "When server error")
+    })
+    public ResponseEntity<UserResponse> me() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return ResponseEntity.ok(userService.findByEmailMapped(userDetails.getEmail()));
+    }
+
     @GetMapping("/search")
     @IsStaff
     @Operation(summary = "Returns all searched users with pagination", tags = "Users")
